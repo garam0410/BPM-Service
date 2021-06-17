@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".login.LoginActivity">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="400dp"
+        android:src="@drawable/logo_splash"></ImageView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/findIdPw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="70dp"
+            android:layout_marginEnd="32dp"
+            android:background="@drawable/shape_round"
+            android:text="ID/PW 찾기"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/setUserPw" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:background="#ffffff"
+            android:text="아이디"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/setUserId"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </TextView>
+
+        <EditText
+            android:id="@+id/setUserId"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#ffffff"
+            android:hint="아이디를 입력하세요."
+            android:singleLine="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView">
+
+        </EditText>
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="72dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="#FFFFFF"
+            android:text="비밀번호"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/setUserPw"
+            app:layout_constraintTop_toBottomOf="@+id/setUserId">
+
+        </TextView>
+
+        <EditText
+            android:id="@+id/setUserPw"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#FFFFFF"
+            android:hint="비밀번호를 입력하세요."
+            android:inputType="textPassword"
+            android:singleLine="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView2">
+
+        </EditText>
+
+        <CheckBox
+            android:id="@+id/autoLoginCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:text="자동 로그인"
+            app:layout_constraintBottom_toTopOf="@+id/Resister"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.463"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/setUserPw"
+            app:layout_constraintVertical_bias="0.484" />
+
+        <Button
+            android:id="@+id/Login"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="70dp"
+            android:background="@drawable/shape_round"
+            android:text="로그인"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/setUserPw" />
+
+        <Button
+            android:id="@+id/Resister"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="70dp"
+            android:background="@drawable/shape_round"
+            android:text="회원가입"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/findIdPw"
+            app:layout_constraintStart_toEndOf="@+id/Login"
+            app:layout_constraintTop_toBottomOf="@+id/setUserPw" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

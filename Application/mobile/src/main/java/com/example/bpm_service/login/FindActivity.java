@@ -6,11 +6,11 @@ import android.os.Bundle;
 
 import com.example.bpm_service.R;
 
-public class FIndActivity extends AppCompatActivity {
+public class FindActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_f_ind);
+        setContentView(R.layout.activity_find);
     }
 }

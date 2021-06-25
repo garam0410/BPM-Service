@@ -2,7 +2,9 @@ package com.example.bpm_service.login;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,26 +16,22 @@ import android.widget.Toast;
 
 import com.example.bpm_service.MainActivity;
 import com.example.bpm_service.R;
-import com.example.bpm_service.connection.ConnectServer;
-
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-
-import retrofit2.Call;
-import retrofit2.Retrofit;
+import com.example.bpm_service.connection.UserManagementServer;
 
 public class LoginActivity extends AppCompatActivity {
 
+    // 컴포넌트 정의
     private Button login, register, find;
     private EditText setUserId, setUserPw;
     private CheckBox auto_LoginCheck;
+
     private ProgressDialog progressDialog;
 
     //자동 로그인 확인 변수
     private SharedPreferences appData;
     private boolean saveLoginData;
 
-    // Edittext 값 변수 선언
+    // EditText 값 변수 선언
     String userId, userPw;
 
     @Override
@@ -41,9 +39,13 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        // 로딩 정의
+        progressDialog = new ProgressDialog(this);
+
         // IP
         String IP = getResources().getString(R.string.IP);
 
+        // ID 연결
         login = (Button) findViewById(R.id.Login);
         register = (Button) findViewById(R.id.Resister);
         find = (Button) findViewById(R.id.findIdPw);
@@ -53,44 +55,84 @@ public class LoginActivity extends AppCompatActivity {
 
         auto_LoginCheck = (CheckBox) findViewById(R.id.autoLoginCheck);
 
+        // 로그인 버튼 눌렀을 때,
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                progressDialog.setMessage("로그인 중입니다.....");
+                progressDialog.show();
+
+                // 로그인을 위한 ID, PW 값 가져오기
                 userId = setUserId.getText().toString();
                 userPw = setUserPw.getText().toString();
 
-                ConnectServer connectServer = new ConnectServer(IP+"8080/login?userId="+userId+"&userPw="+userPw);
-
-                String result = connectServer.login();
-
-                if(result.trim().equals("Success")){
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
-                    finish();
+                if((userId.equals("") || userPw.equals("")) || (userId.equals("") && userPw.equals(""))){
+                    alertHandler(false,"입력 오류", "항목을 모두 입력해 주세요.");
                 }
-                else if(result.trim().equals("Empty")){
-                    Toast.makeText(getApplication(), "회원이 아니거나, 입력하신 정보가 올바르지 않습니다.", Toast.LENGTH_SHORT).show();
-                }
-
                 else{
-                    Toast.makeText(getApplication(), result.trim(), Toast.LENGTH_SHORT).show();
+                    // 서버 통신 URL 구성
+                    UserManagementServer userManagementServer = new UserManagementServer(IP);
+
+                    // 통신 결과 반환
+                    String result = userManagementServer.login(userId, userPw);
+
+                    //로그인 성공
+                    if(result.trim().equals("Success")){
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+
+                    // 로그인 실패 (정보 없음)
+                    else if(result.trim().equals("Empty")){
+                        alertHandler(false,"로그인 실패", "회원이 아니거나, 입력하신 정보가 올바르지 않습니다.");
+                        progressDialog.cancel();
+                    }
+
+                    // 로그인 실패 (서버 에러)
+                    else{
+                        alertHandler(false,result.trim(),result.trim());
+                        progressDialog.cancel();
+                    }
                 }
             }
         });
 
+        // 회원가입 버튼 눌렀을 때, RegisterActivity로 이동
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
+                startActivity(intent);
             }
         });
 
+        // ID/PW 찾기 버튼 눌렀을 때, FindActivity로 이동
         find.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(getApplicationContext(), FindActivity.class);
+                startActivity(intent);
             }
         });
+    }
+
+    // DialogHandler
+    public void alertHandler(Boolean tf, String title, String message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+        builder.setTitle(title).setMessage(message);
+
+        builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(tf){
+                    finish();
+                }
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 }

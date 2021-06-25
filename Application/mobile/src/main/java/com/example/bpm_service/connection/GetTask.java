@@ -4,6 +4,7 @@ package com.example.bpm_service.connection;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -47,7 +48,7 @@ public class GetTask extends AsyncTask<String, Void, String> {
             Log.d("REST GET", "The response is : " + response);
             inputStream = conn.getInputStream();
 
-            resultString = convertInputStreamToString(inputStream, inputStream.toString().length());
+            resultString = convertInputStreamToString(inputStream);
             Log.d("REST GET", "The value is : " + resultString.trim());
 
         }catch(IOException e){
@@ -58,11 +59,9 @@ public class GetTask extends AsyncTask<String, Void, String> {
     }
 
     // Buffer 변환
-    public String convertInputStreamToString(InputStream stream, int length) throws IOException, UnsupportedEncodingException {
-        Reader reader = null;
-        reader = new InputStreamReader(stream, "UTF-8");
-        char[] buffer = new char[length];
-        reader.read(buffer);
-        return new String(buffer);
+    public String convertInputStreamToString(InputStream stream) throws IOException, UnsupportedEncodingException {
+        BufferedReader bf;
+        bf = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+        return bf.readLine();
     }
 }

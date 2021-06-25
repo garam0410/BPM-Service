@@ -55,47 +55,26 @@ public class LoginActivity extends AppCompatActivity {
 
         auto_LoginCheck = (CheckBox) findViewById(R.id.autoLoginCheck);
 
+        //자동로그인
+        Intent intent_2 = getIntent();
+        saveLoginData = intent_2.getBooleanExtra("SAVE_LOGIN_DATA", false);
+
+        //계정 정보 저장을 위한 SharedPreferences 생성
+        appData = getSharedPreferences("appData", MODE_PRIVATE);
+        load();
+
+        if(saveLoginData){
+            setUserId.setText(userId);
+            setUserPw.setText(userPw);
+            auto_LoginCheck.setChecked(saveLoginData);
+            login(IP);
+        }
+
         // 로그인 버튼 눌렀을 때,
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                progressDialog.setMessage("로그인 중입니다.....");
-                progressDialog.show();
-
-                // 로그인을 위한 ID, PW 값 가져오기
-                userId = setUserId.getText().toString();
-                userPw = setUserPw.getText().toString();
-
-                if((userId.equals("") || userPw.equals("")) || (userId.equals("") && userPw.equals(""))){
-                    alertHandler(false,"입력 오류", "항목을 모두 입력해 주세요.");
-                }
-                else{
-                    // 서버 통신 URL 구성
-                    UserManagementServer userManagementServer = new UserManagementServer(IP);
-
-                    // 통신 결과 반환
-                    String result = userManagementServer.login(userId, userPw);
-
-                    //로그인 성공
-                    if(result.trim().equals("Success")){
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-
-                    // 로그인 실패 (정보 없음)
-                    else if(result.trim().equals("Empty")){
-                        alertHandler(false,"로그인 실패", "회원이 아니거나, 입력하신 정보가 올바르지 않습니다.");
-                        progressDialog.cancel();
-                    }
-
-                    // 로그인 실패 (서버 에러)
-                    else{
-                        alertHandler(false,result.trim(),result.trim());
-                        progressDialog.cancel();
-                    }
-                }
+                login(IP);
             }
         });
 
@@ -134,5 +113,66 @@ public class LoginActivity extends AppCompatActivity {
 
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    //로그인
+    public void login(String IP){
+
+        progressDialog.setMessage("로그인 중입니다.....");
+        progressDialog.show();
+
+        // 로그인을 위한 ID, PW 값 가져오기
+        userId = setUserId.getText().toString();
+        userPw = setUserPw.getText().toString();
+
+        if((userId.equals("") || userPw.equals("")) || (userId.equals("") && userPw.equals(""))){
+            alertHandler(false,"입력 오류", "항목을 모두 입력해 주세요.");
+        }
+        else{
+            // 서버 통신 URL 구성
+            UserManagementServer userManagementServer = new UserManagementServer(IP);
+
+            // 통신 결과 반환
+            String result = userManagementServer.login(userId, userPw);
+
+            //로그인 성공
+            if(result.trim().equals("Success")){
+                save();
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.putExtra("SAVE_LOGIN_DATA",saveLoginData);
+                intent.putExtra("userId", userId);
+                startActivity(intent);
+                finish();
+            }
+
+            // 로그인 실패 (정보 없음)
+            else if(result.trim().equals("Empty")){
+                alertHandler(false,"로그인 실패", "회원이 아니거나, 입력하신 정보가 올바르지 않습니다.");
+                progressDialog.cancel();
+            }
+
+            // 로그인 실패 (서버 에러)
+            else{
+                alertHandler(false,result.trim(),result.trim());
+                progressDialog.cancel();
+            }
+        }
+    }
+    //계정 정보 저장
+    private void save(){
+        SharedPreferences.Editor editor = appData.edit();
+
+        editor.putBoolean("SAVE_LOGIN_DATA", auto_LoginCheck.isChecked());
+        editor.putString("userId", setUserId.getText().toString().trim());
+        editor.putString("userPw", setUserPw.getText().toString().trim());
+
+        editor.apply();
+    }
+
+    //저장된 정보 불러오기
+    public void load(){
+        saveLoginData = appData.getBoolean("SAVE_LOGIN_DATA", false);
+        userId = appData.getString("userId", "");
+        userPw = appData.getString("userPw", "");
     }
 }

@@ -1,5 +1,6 @@
 package com.example.bpm_service.login;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
@@ -33,6 +34,10 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        //상단바 숨기기
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
 
         // 로딩 정의
         progressDialog = new ProgressDialog(this);

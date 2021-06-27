@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Movie by Heart</string>
     <string name="IP">http://118.67.132.152:</string>
+
+    <string name="myPage">마이 페이지</string>
+    <string name="scan">QR 코드 스캔</string>
+    <string name="searchResult">검색 결과</string>
 </resources>

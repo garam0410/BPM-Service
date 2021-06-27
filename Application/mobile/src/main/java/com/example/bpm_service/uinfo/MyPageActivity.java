@@ -2,6 +2,7 @@ package com.example.bpm_service.uinfo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.bpm_service.MainActivity;
 import com.example.bpm_service.R;
 
 public class MyPageActivity extends Fragment {
@@ -17,6 +19,9 @@ public class MyPageActivity extends Fragment {
         View view = inflater.inflate(R.layout.activity_mypage, container, false);
 
         //정의
+        ActionBar actionbar = ((MainActivity)getActivity()).getSupportActionBar();
+        actionbar.setTitle(R.string.myPage);
+        actionbar.show();
 
         return view;
     }

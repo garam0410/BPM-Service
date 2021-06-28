@@ -18,11 +18,6 @@ public class MyPageActivity extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle saveInstanceState){
         View view = inflater.inflate(R.layout.activity_mypage, container, false);
 
-        //정의
-        ActionBar actionbar = ((MainActivity)getActivity()).getSupportActionBar();
-        actionbar.setTitle(R.string.myPage);
-        actionbar.show();
-
         return view;
     }
 }

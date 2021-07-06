@@ -120,10 +120,7 @@ public class SearchActivity extends Fragment {
 
                 Intent intent = new Intent(getActivity(), MInfoActivity.class);
                 intent.putExtra("userId", userId);
-                intent.putExtra("title",item.getTitle());
-                intent.putExtra("image", item.getImage());
-                intent.putExtra("director", item.getDirector());
-                intent.putExtra("actor", item.getActor());
+                intent.putExtra("title", item.getTitle());
                 startActivity(intent);
             }
         });

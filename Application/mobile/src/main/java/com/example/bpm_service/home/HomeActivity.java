@@ -3,42 +3,42 @@ package com.example.bpm_service.home;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.bpm_service.MainActivity;
 import com.example.bpm_service.R;
 import com.example.bpm_service.connection.MovieInformationServer;
-import com.example.bpm_service.minfo.MovieListAdapter;
+import com.example.bpm_service.minfo.MInfoActivity;
 import com.example.bpm_service.minfo.MyListDecoration;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class HomeActivity extends Fragment {
 
     private RecyclerView movieRankList, userRankList;
-    private MovieListAdapter movieListAdapter_rank;
-    private MovieListAdapter movieListAdapter_user;
+    public MovieListAdapter movieListAdapter_rank;
+    public MovieListAdapter movieListAdapter_user;
+
+    public String hotData;
+    public String userId="";
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle saveInstanceState){
         View view = inflater.inflate(R.layout.activity_home, container, false);
 
-        String IP = getResources().getString(R.string.IP);
-        //String IP = "http://61.245.226.112:";
+        //String IP = getResources().getString(R.string.IP);
+        String IP = "http://61.245.226.112:";
 
         movieRankList = view.findViewById(R.id.hotMovieRank);
         userRankList = view.findViewById(R.id.userMovieRank);
@@ -46,9 +46,12 @@ public class HomeActivity extends Fragment {
         ActionBar actionbar = ((MainActivity)getActivity()).getSupportActionBar();
         actionbar.hide();
 
+        Bundle bundle = getArguments();
+        userId = bundle.getString("userId");
+
         MovieInformationServer movieInformationServer = new MovieInformationServer(IP);
 
-        String hotData = movieInformationServer.hotMovieRank();
+        hotData = movieInformationServer.hotMovieRank();
         //String userData = movieInformationServer.userMovieRank();
 
         init(movieRankList,movieListAdapter_rank, hotData);
@@ -98,8 +101,11 @@ public class HomeActivity extends Fragment {
     private View.OnClickListener onClickItem = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            String str = (String) v.getTag();
-            Toast.makeText(getActivity(), str, Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getActivity(), MInfoActivity.class);
+            intent.putExtra("userId", userId);
+            intent.putExtra("title", (String) v.getTag());
+            intent.putExtra("hotData", hotData);
+            startActivity(intent);
         }
     };
 }

@@ -31,7 +31,7 @@ public class MovieInformationServer {
     // 영화 순위
     public String hotMovieRank(){
         try {
-            url += "8081/hotmovierank";
+            url += "8000/hotmovierank";
             return new GetTask().execute(url).get();
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -43,9 +43,9 @@ public class MovieInformationServer {
     }
 
     // 상세 정보
-    public JSONObject getInfo(String title){
+    public JSONObject getInfo(String title, String userId){
         try{
-            url += "8081/movieinfo?title="+title;
+            url += "8000/movieinfo?userId="+userId+"&title="+title;
             data = new GetTask().execute(url).get();
 
             JSONArray json = new JSONArray(data);
@@ -53,6 +53,16 @@ public class MovieInformationServer {
 
             return obj;
 
+        }catch(Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String changeLove(String userId, String title, String state){
+        try{
+            url += "8000/changelove?userId="+userId+"&title="+title+"&state="+state;
+            return new GetTask().execute(url).get();
         }catch(Exception e) {
             e.printStackTrace();
             return null;

@@ -1,4 +1,4 @@
-package com.example.bpm_service.minfo;
+package com.example.bpm_service.home;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -24,7 +24,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
     private ArrayList<String> titleList;
     private ArrayList<String> imageList;
 
-    public MovieListAdapter(Context context, ArrayList<String> itemList, ArrayList<String> titleList, ArrayList<String> imageList ,View.OnClickListener onClickItem) {
+    public MovieListAdapter(Context context, ArrayList<String> itemList, ArrayList<String> titleList, ArrayList<String> imageList , View.OnClickListener onClickItem) {
         this.context = context;
         this.itemList = itemList;
         this.titleList = titleList;
@@ -38,7 +38,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 
         // context 와 parent.getContext() 는 같다.
         View view = LayoutInflater.from(context)
-                .inflate(R.layout.movierank_item_infoactivity, parent, false);
+                .inflate(R.layout.movierank_item, parent, false);
 
         return new ViewHolder(view);
     }

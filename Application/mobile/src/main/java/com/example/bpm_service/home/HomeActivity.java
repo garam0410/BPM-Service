@@ -37,8 +37,8 @@ public class HomeActivity extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle saveInstanceState){
         View view = inflater.inflate(R.layout.activity_home, container, false);
 
-        //String IP = getResources().getString(R.string.IP);
-        String IP = "http://61.245.226.112:";
+        String IP = getResources().getString(R.string.IP);
+        //String IP = "http://61.245.226.112:";
 
         movieRankList = view.findViewById(R.id.hotMovieRank);
         userRankList = view.findViewById(R.id.userMovieRank);

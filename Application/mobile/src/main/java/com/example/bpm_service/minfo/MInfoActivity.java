@@ -42,8 +42,8 @@ public class MInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_m_info);
 
-        //IP = getResources().getString(R.string.IP);
-        IP = "http://61.245.226.112:";
+        IP = getResources().getString(R.string.IP);
+        //IP = "http://61.245.226.112:";
 
         // 상단바 제거
         ActionBar actionBar = getSupportActionBar();

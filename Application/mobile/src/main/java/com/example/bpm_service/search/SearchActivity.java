@@ -11,7 +11,9 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.service.autofill.OnClickAction;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,13 +43,14 @@ public class SearchActivity extends Fragment {
     private ProgressDialog progressDialog;
 
     private SearchListAdapter adapter;
+    public String IP;
     private String data;
     private String userId;
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle saveInstanceState){
         View view = inflater.inflate(R.layout.activity_search, container, false);
 
-        String IP = container.getResources().getString(R.string.IP);
+        IP = container.getResources().getString(R.string.IP);
 
         userId = getArguments().getString("userId");
 
@@ -67,49 +70,22 @@ public class SearchActivity extends Fragment {
         adapter = new SearchListAdapter();
         searchList.setAdapter(adapter);
 
+        search_bar.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)){
+                    search();
+                    return true;
+                }
+                return false;
+            }
+        });
+
         // 검색버튼 클릭 시,
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressDialog.setMessage("검색중...");
-                progressDialog.show();
-
-                String query = search_bar.getText().toString();
-
-                // 공백 검사
-                if(query.equals("")){
-                    alertHandler(false,"검색어 없음", "검색어를 입력해주세요.");
-                }
-                else{
-
-                    adapter.notifyDataSetChanged();
-                    adapter.clearItem();
-
-                    // 데이터 불러오기
-                    MovieInformationServer movieInformationServer = new MovieInformationServer(IP);
-                    data = movieInformationServer.search(query);
-
-                    // 리스트 추가
-                    try {
-                        JSONArray json = new JSONArray(data);
-                        for(int i = 0; i<json.length(); i++){
-
-                            JSONObject obj = (JSONObject)json.get(i);
-
-                            String title = obj.getString("title");
-                            String image = obj.getString("image");
-                            String director = obj.getString("director");
-                            String actor = obj.getString("actor");
-
-                            adapter.addItem(image,title,director,actor);
-                        }
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                progressDialog.cancel();
+                search();
             }
         });
 
@@ -142,5 +118,47 @@ public class SearchActivity extends Fragment {
 
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    public void search(){
+        progressDialog.setMessage("검색중...");
+        progressDialog.show();
+
+        String query = search_bar.getText().toString();
+
+        // 공백 검사
+        if(query.equals("")){
+            alertHandler(false,"검색어 없음", "검색어를 입력해주세요.");
+        }
+        else{
+
+            adapter.notifyDataSetChanged();
+            adapter.clearItem();
+
+            // 데이터 불러오기
+            MovieInformationServer movieInformationServer = new MovieInformationServer(IP);
+            data = movieInformationServer.search(query);
+
+            // 리스트 추가
+            try {
+                JSONArray json = new JSONArray(data);
+                for(int i = 0; i<json.length(); i++){
+
+                    JSONObject obj = (JSONObject)json.get(i);
+
+                    String title = obj.getString("title");
+                    String image = obj.getString("image");
+                    String director = obj.getString("director");
+                    String actor = obj.getString("actor");
+
+                    adapter.addItem(image,title,director,actor);
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        progressDialog.cancel();
     }
 }

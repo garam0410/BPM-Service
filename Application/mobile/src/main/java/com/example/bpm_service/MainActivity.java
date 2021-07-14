@@ -3,16 +3,21 @@ package com.example.bpm_service;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
 
 import com.example.bpm_service.home.HomeActivity;
 import com.example.bpm_service.minfo.MInfoActivity;
+import com.example.bpm_service.scan.ScanActivity;
 import com.example.bpm_service.search.SearchActivity;
 import com.example.bpm_service.uinfo.MyPageActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -23,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
 
     // fragment manager 생성
     private FragmentManager fragmentManager;
+
+    //QR 버튼
+    private ImageButton qrButton;
 
     // fragment로 지정할 Activity
     private HomeActivity fragment_home;
@@ -46,10 +54,6 @@ public class MainActivity extends AppCompatActivity {
             SAVE_LOGIN_DATA = intent.getBooleanExtra("SAVE_LOGIN_DATA", false);
             userId = intent.getStringExtra("userId");
         }
-
-        //상단바 숨기기
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
 
         bottomNavigationView = findViewById(R.id.bottomNavigationBar);
         bottomNavigationView.setSelectedItemId(R.id.action_home);
@@ -78,9 +82,42 @@ public class MainActivity extends AppCompatActivity {
         fragment_myPage = new MyPageActivity();
         fragment_minfo = new MInfoActivity();
 
-
         //첫화면을 홈으로
         setFrag(1);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        ActionBar actionBar = getSupportActionBar();
+
+        // Custom Actionbar를 사용하기 위해 CustomEnabled을 true 시키고 필요 없는 것은 false 시킨다
+        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(false);            //액션바 아이콘을 업 네비게이션 형태로 표시합니다.
+        actionBar.setDisplayShowTitleEnabled(false);        //액션바에 표시되는 제목의 표시유무를 설정합니다.
+        actionBar.setDisplayShowHomeEnabled(false);            //홈 아이콘을 숨김처리합니다.
+
+
+        //layout을 가지고 와서 actionbar에 포팅을 시킵니다.
+        LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+        View actionbar = inflater.inflate(R.layout.custom_actionbar, null);
+
+        actionBar.setCustomView(actionbar);
+
+        //액션바 양쪽 공백 없애기
+        Toolbar parent = (Toolbar)actionbar.getParent();
+        parent.setContentInsetsAbsolute(0,0);
+
+        qrButton = (ImageButton) findViewById(R.id.qrButton);
+        qrButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent qr = new Intent(getApplicationContext(), ScanActivity.class);
+                startActivity(qr);
+            }
+        });
+
+        actionBar.show();
+        return true;
     }
 
     private void setFrag(int n){

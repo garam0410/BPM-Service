@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:gravity="center_vertical"
+    android:background="#2F9D27"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_alignParentLeft="true"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="@drawable/movielogo"
+        android:background="@color/teal_700"/>
+
+    <TextView
+        android:text="Movie By Heart"
+        android:id="@+id/title"
+        android:textSize="20sp"
+        android:textColor="#fff"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="17dp"
+        android:layout_toRightOf="@id/btnBack"
+        android:layout_width="match_parent"
+        android:layout_height="56dp" />
+
+    <ImageButton
+        android:id="@+id/qrButton"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/qr_vector"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="5dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="10dp"/>
+</RelativeLayout>

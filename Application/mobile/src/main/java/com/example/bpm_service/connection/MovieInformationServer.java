@@ -59,6 +59,7 @@ public class MovieInformationServer {
         }
     }
 
+    // 영화 좋아요 상태 변경
     public String changeLove(String userId, String title, String state){
         try{
             url += "8081/changelove?userId="+userId+"&title="+title+"&state="+state;

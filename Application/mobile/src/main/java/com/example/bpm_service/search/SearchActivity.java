@@ -52,8 +52,8 @@ public class SearchActivity extends Fragment {
         userId = getArguments().getString("userId");
 
         // 상단바 제거
-        ActionBar actionBar = ((MainActivity)getActivity()).getSupportActionBar();
-        actionBar.hide();
+//        ActionBar actionBar = ((MainActivity)getActivity()).getSupportActionBar();
+//        actionBar.hide();
 
         // 로딩 정의
         progressDialog = new ProgressDialog(getActivity());

@@ -43,9 +43,6 @@ public class HomeActivity extends Fragment {
         movieRankList = view.findViewById(R.id.hotMovieRank);
         userRankList = view.findViewById(R.id.userMovieRank);
 
-        ActionBar actionbar = ((MainActivity)getActivity()).getSupportActionBar();
-        actionbar.hide();
-
         Bundle bundle = getArguments();
         userId = bundle.getString("userId");
 

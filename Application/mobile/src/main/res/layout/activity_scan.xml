@@ -37,12 +37,20 @@
         </TextView>
 
         <ImageButton
+            android:id="@+id/qrStart"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#ffffff"
             android:src="@drawable/qr_vector">
 
         </ImageButton>
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </TextView>
 
     </LinearLayout>
 

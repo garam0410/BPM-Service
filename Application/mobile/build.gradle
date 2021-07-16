@@ -42,5 +42,6 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.4.0'
     compile 'com.squareup.retrofit2:converter-gson:2.4.0'
     implementation 'com.android.support:recyclerview-v7:26.+'
+    implementation 'com.rmtheis:tess-two:9.0.0'
     wearApp project(":wear")
 }

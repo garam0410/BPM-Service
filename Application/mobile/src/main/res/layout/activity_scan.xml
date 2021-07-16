@@ -7,76 +7,96 @@
     android:orientation="vertical"
     tools:context=".scan.ScanActivity">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_margin="20dp">
-
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:text="QR을 클릭해주세요."
-            android:textColor="@color/black"
-            android:textSize="20dp">
-
-        </TextView>
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="10dp"
-            android:layout_weight="1"
-            android:text="QR코드가 포함된 영화 티켓을 등록해주세요"
-            android:textSize="15dp">
-        </TextView>
-
-        <ImageButton
-            android:id="@+id/qrStart"
+        android:layout_height="match_parent">
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#ffffff"
-            android:src="@drawable/qr_vector">
+            android:orientation="vertical">
 
-        </ImageButton>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="20dp">
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:text="QR을 클릭해주세요."
+                    android:textColor="@color/black"
+                    android:textSize="20dp">
 
-        </TextView>
+                </TextView>
 
-    </LinearLayout>
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="10dp"
+                    android:layout_weight="1"
+                    android:text="QR코드가 포함된 영화 티켓을 등록해주세요"
+                    android:textSize="15dp">
+                </TextView>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:gravity="center">
+                <ImageButton
+                    android:id="@+id/qrStart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="400dp"
+                    android:scaleType="fitCenter"
+                    android:background="#ffffff"
+                    android:src="@drawable/qr_vector">
 
-        <Button
-            android:id="@+id/cancel_button"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="취소">
-        </Button>
+                </ImageButton>
 
-        <Button
-            android:id="@+id/apply_button"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="확인">
-        </Button>
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-    </LinearLayout>
+                </TextView>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/cancel_button"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="취소">
+                </Button>
+
+                <Button
+                    android:id="@+id/loadPicture"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="불러오기"
+                    android:layout_margin="10dp">
+
+                </Button>
+
+                <Button
+                    android:id="@+id/apply_button"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="확인">
+                </Button>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

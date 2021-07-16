@@ -6,7 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
 import android.Manifest;
-import android.content.Context;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
@@ -18,15 +18,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.bpm_service.R;
 import com.googlecode.tesseract.android.TessBaseAPI;
@@ -42,31 +39,28 @@ import java.util.Date;
 
 public class ScanActivity extends AppCompatActivity {
 
-    private Button applyButton, cancelButton;
+    private static final int REQUEST_IMAGE_CAPTURE = 672;
+    private final int GET_GALLERY_IMAGE = 200;
+
+    private String imageFilePath;
+    private Uri photoUri;
+
+    private Button applyButton, cancelButton, loadButton;
     private ImageButton qrButton;
+    private TextView textView;
 
-    // true  : Camera On  : 카메라로 직접 찍어 문자 인식
-    // false : Camera Off : 샘플이미지를 로드하여 문자 인식
-    private boolean CameraOnOffFlag = true;
+    private ProgressDialog progressDialog;
 
-    private TessBaseAPI m_Tess; //Tess API reference
-    private ProgressCircleDialog m_objProgressCircle = null; // 원형 프로그레스바
-    private MessageHandler m_messageHandler;
-
-    private Context mContext;
-    private String mDataPath = ""; //언어데이터가 있는 경로
-    private String mCurrentPhotoPath; // 사진 경로
-    private final String[] mLanguageList = {"eng","kor"}; // 언어
-    // View
-    private TextView m_ocrTextView; // 결과 변환 텍스트
-    private Bitmap image; //사용되는 이미지
-    private boolean ProgressFlag = false; // 프로그레스바 상태 플래그
+    Bitmap image;
+    private TessBaseAPI mTess;
+    String dataPath = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
-        mContext = this;
+
+        progressDialog = new ProgressDialog(this);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("QR 영화 등록");
@@ -75,25 +69,10 @@ public class ScanActivity extends AppCompatActivity {
         qrButton = (ImageButton) findViewById(R.id.qrStart);
 
         //결과 텍스트
-        m_ocrTextView = (TextView) findViewById(R.id.textView);
+        textView = (TextView) findViewById(R.id.textView);
 
         cancelButton = (Button) findViewById(R.id.cancel_button);
         applyButton = (Button) findViewById(R.id.apply_button);
-
-        m_objProgressCircle = new ProgressCircleDialog(this);
-        m_messageHandler = new MessageHandler();
-
-        if(CameraOnOffFlag)
-        {
-            PermissionCheck();
-            Tesseract();
-        }
-        else
-        {
-            //이미지 디코딩을 위한 초기화
-            image = BitmapFactory.decodeResource(getResources(), R.drawable.sampledata); //샘플이미지파일
-            Test();
-        }
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,88 +84,20 @@ public class ScanActivity extends AppCompatActivity {
         qrButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(CameraOnOffFlag)
-                {
-                    dispatchTakePictureIntent();
-                }
-                else
-                {
-                    processImage();
-                }
+                PermissionCheck();
+                sendTakePhotoIntent();
             }
         });
-    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case ConstantDefine.PERMISSION_CODE:
-                Toast.makeText(this, "권한이 허용되었습니다.", Toast.LENGTH_SHORT).show();
-                break;
-            case ConstantDefine.ACT_TAKE_PIC:
-                //카메라로 찍은 사진을 받는다.
-                if ((resultCode == RESULT_OK) ) {
-
-                    try {
-                        File file = new File(mCurrentPhotoPath);
-                        Bitmap rotatedBitmap = null;
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),
-                                FileProvider.getUriForFile(ScanActivity.this,
-                                        getApplicationContext().getPackageName() + ".fileprovider", file));
-
-                        // 회전된 사진을 원래대로 돌려 표시한다.
-                        if (bitmap != null) {
-                            ExifInterface ei = new ExifInterface(mCurrentPhotoPath);
-                            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
-                                    ExifInterface.ORIENTATION_UNDEFINED);
-                            switch (orientation) {
-
-                                case ExifInterface.ORIENTATION_ROTATE_90:
-                                    rotatedBitmap = rotateImage(bitmap, 90);
-                                    break;
-
-                                case ExifInterface.ORIENTATION_ROTATE_180:
-                                    rotatedBitmap = rotateImage(bitmap, 180);
-                                    break;
-
-                                case ExifInterface.ORIENTATION_ROTATE_270:
-                                    rotatedBitmap = rotateImage(bitmap, 270);
-                                    break;
-
-                                case ExifInterface.ORIENTATION_NORMAL:
-                                default:
-                                    rotatedBitmap = bitmap;
-                            }
-                            OCRThread ocrThread = new OCRThread(rotatedBitmap);
-                            ocrThread.setDaemon(true);
-                            ocrThread.start();
-                            qrButton.setImageBitmap(rotatedBitmap);// 카메라로 찍은 사진을 뷰에 표시한다.
-                            m_ocrTextView.setText(getResources().getString(R.string.LoadingMessage)); //인식된텍스트 표시
-                        }
-                    } catch (Exception e) {
-                    }
-                }
-                break;
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,  int[] grantResult) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResult);
-        if (requestCode == 0) {
-
-        } else {
-
-        }
-    }
-
-    // 이미지를 원본과 같게 회전시킨다.
-    public static Bitmap rotateImage(Bitmap source, float angle) {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(angle);
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
-                matrix, true);
+        loadButton = (Button) findViewById(R.id.loadPicture);
+        loadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent. setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+                startActivityForResult(intent, GET_GALLERY_IMAGE);
+            }
+        });
     }
 
     public void PermissionCheck() {
@@ -201,226 +112,177 @@ public class ScanActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(ScanActivity.this,
                         new String[]{Manifest.permission.CAMERA,
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        ConstantDefine.PERMISSION_CODE);
+                        2);
             } else {
                 // 권한 있음
             }
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-    public void Tesseract() {
-        //언어파일 경로
-        mDataPath = getFilesDir() + "/tesseract/";
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            image = BitmapFactory.decodeFile(imageFilePath);
 
-        //트레이닝데이터가 카피되어 있는지 체크
-        String lang = "";
-        for (String Language : mLanguageList) {
-            checkFile(new File(mDataPath + "tessdata/"), Language);
-            lang += Language + "+";
+            OCRReady();
         }
-        m_Tess = new TessBaseAPI();
-        m_Tess.init(mDataPath, lang);
+
+        else if (requestCode == GET_GALLERY_IMAGE && resultCode == RESULT_OK && data != null && data.getData() != null) {
+
+            Uri selectedImageUri = data.getData();
+            try {
+                image = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
+                qrButton.setImageBitmap(image);
+                imageFilePath = selectedImageUri.getPath();
+
+                OCRReady();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
+    private void OCRReady(){
+        ExifInterface exif = null;
 
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
+        try {
+            exif = new ExifInterface(imageFilePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        int exifOrientation;
+        int exifDegree;
+
+        if (exif != null) {
+            exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            exifDegree = exifOrientationToDegrees(exifOrientation);
+        } else {
+            exifDegree = 0;
+        }
+        progressDialog.setMessage("분석중입니다....");
+        progressDialog.show();
+
+        //언어파일 경로
+        dataPath = getFilesDir() + "/tesseract/";
+        System.out.println(getFilesDir());
+
+        //트레이닝 데이터가 카피되어 있는지 체크
+        checkFile(new File(dataPath + "tessdata/"),"eng");
+        checkFile(new File(dataPath + "tessdata/"),"kor");
+
+        // 변환 언어 선택
+        String lang = "eng+kor";
+
+        //OCR 세팅
+        mTess = new TessBaseAPI();
+        mTess.init(dataPath,lang);
+        image = rotate(image, exifDegree);
+        qrButton.setImageBitmap(image);
+        processImage();
     }
 
-    /**
-     * 기본카메라앱을 실행 시킨다.
-     */
-    private void dispatchTakePictureIntent() {
+    private int exifOrientationToDegrees(int exifOrientation) {
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
+            return 90;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
+            return 180;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
+            return 270;
+        }
+        return 0;
+    }
+
+    private Bitmap rotate(Bitmap bitmap, float degree) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
+
+    private void sendTakePhotoIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // 사진파일을 생성한다.
             File photoFile = null;
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
                 // Error occurred while creating the File
             }
-            // 사진파일이 정상적으로 생성되었을때
+
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
-                        this.getApplicationContext().getPackageName()+".fileprovider",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, ConstantDefine.ACT_TAKE_PIC);
+                photoUri = FileProvider.getUriForFile(this, getPackageName(), photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
         }
     }
 
-    //copy file to device
-    private void copyFiles(String Language) {
-        try {
-            String filepath = mDataPath + "/tessdata/" + Language + ".traineddata";
-            AssetManager assetManager = getAssets();
-            InputStream instream = assetManager.open("tessdata/"+Language+".traineddata");
-            OutputStream outstream = new FileOutputStream(filepath);
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "TEST_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,      /* prefix */
+                ".jpg",         /* suffix */
+                storageDir          /* directory */
+        );
+        imageFilePath = image.getAbsolutePath();
+        return image;
+    }
+
+    // 이미지에서 텍스트 읽기
+    public void processImage(){
+        String OCRresult = null;
+        mTess.setImage(image);
+        OCRresult = mTess.getUTF8Text();
+
+        textView.setText(OCRresult);
+        progressDialog.cancel();
+    }
+
+    //언어 데이터 파일, 디바이스에 복사
+    private void copyFiles(String lang){
+        try{
+
+            String filePath = dataPath + "/tessdata/"+lang+".traineddata";
+            AssetManager assetManager = this.getAssets();
+            InputStream inputStream = assetManager.open("tessdata/"+lang+".traineddata");
+            OutputStream outputStream = new FileOutputStream(filePath);
             byte[] buffer = new byte[1024];
+
             int read;
-            while ((read = instream.read(buffer)) != -1) {
-                outstream.write(buffer, 0, read);
+            while((read = inputStream.read(buffer)) != -1){
+                outputStream.write(buffer, 0, read);
             }
-            outstream.flush();
-            outstream.close();
-            instream.close();
 
-        } catch (FileNotFoundException e) {
+            outputStream.flush();
+            outputStream.close();
+            inputStream.close();
+
+        }catch(FileNotFoundException e){
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    //check file on the device
-    private void checkFile(File dir, String Language) {
-        //디렉토리가 없으면 디렉토리를 만들고 그후에 파일을 카피
-        if (!dir.exists() && dir.mkdirs()) {
-            copyFiles(Language);
-        }
-        //디렉토리가 있지만 파일이 없으면 파일카피 진행
-        if (dir.exists()) {
-            String datafilepath = mDataPath + "tessdata/" + Language + ".traineddata";
-            File datafile = new File(datafilepath);
-            if (!datafile.exists()) {
-                copyFiles(Language);
-            }
-        }
-    }
-
-    //region Thread
-    public class OCRThread extends Thread
-    {
-        private Bitmap rotatedImage;
-        OCRThread(Bitmap rotatedImage)
-        {
-            this.rotatedImage = rotatedImage;
-            if(!ProgressFlag)
-                m_objProgressCircle = ProgressCircleDialog.show(mContext, "", "", true);
-            ProgressFlag = true;
-        }
-
-        @Override
-        public void run() {
-            super.run();
-            // 사진의 글자를 인식해서 옮긴다
-            String OCRresult = null;
-            m_Tess.setImage(rotatedImage);
-            OCRresult = m_Tess.getUTF8Text();
-
-            Message message = Message.obtain();
-            message.what = ConstantDefine.RESULT_OCR;
-            message.obj = OCRresult;
-            m_messageHandler.sendMessage(message);
-
-        }
-    }
-    //endregion
-
-    //region Handler
-    public class MessageHandler extends Handler
-    {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-
-            switch (msg.what)
-            {
-                case ConstantDefine.RESULT_OCR:
-                    TextView OCRTextView = findViewById(R.id.textView);
-                    OCRTextView.setText(String.valueOf(msg.obj)); //텍스트 변경
-
-                    // 원형 프로그레스바 종료
-                    if(m_objProgressCircle.isShowing() && m_objProgressCircle !=null)
-                        m_objProgressCircle.dismiss();
-                    ProgressFlag = false;
-                    Toast.makeText(mContext,getResources().getString(R.string.CompleteMessage),Toast.LENGTH_SHORT).show();
-                    break;
-            }
-        }
-    }
-    //endregion
-
-    public void Test()
-    {
-//        String lang = "eng";
-        image = BitmapFactory.decodeResource(getResources(), R.drawable.sampledata);
-        mDataPath = getFilesDir()+ "/tesseract/";
-
-//        checkFile2(new File(mDataPath + "tessdata/"),lang);
-
-        String lang = "";
-        for (String Language : mLanguageList) {
-            checkFile(new File(mDataPath + "tessdata/"), Language);
-            lang += Language + "+";
-        }
-        lang = lang.substring(0,lang.length()-1);
-        m_Tess = new TessBaseAPI();
-        m_Tess.init(mDataPath, lang);
-    }
-    private void copyFiles2(String lang) {
-        try {
-            //location we want the file to be at
-            String filepath = mDataPath + "/tessdata/"+lang+".traineddata";
-
-            //get access to AssetManager
-            AssetManager assetManager = getAssets();
-
-            //open byte streams for reading/writing
-            InputStream instream = assetManager.open("tessdata/"+lang+".traineddata");
-            OutputStream outstream = new FileOutputStream(filepath);
-
-            //copy the file to the location specified by filepath
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = instream.read(buffer)) != -1) {
-                outstream.write(buffer, 0, read);
-            }
-            outstream.flush();
-            outstream.close();
-            instream.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        }catch (IOException e){
             e.printStackTrace();
         }
     }
 
-    private void checkFile2(File dir,String lang) {
-        //directory does not exist, but we can successfully create it
-        if (!dir.exists()&& dir.mkdirs()){
-            copyFiles2(lang);
+    //언어 데이터 파일 존재 유무 체크
+    private void checkFile(File dir, String lang){
+        if(!dir.exists() && dir.mkdirs()){
+            System.out.println("파일도 없고 폴더도없어용");
+            copyFiles(lang);
         }
-        //The directory exists, but there is no data file in it
-        if(dir.exists()) {
-            String datafilepath = mDataPath+ "/tessdata/"+lang+".traineddata";
-            File datafile = new File(datafilepath);
-            if (!datafile.exists()) {
-                copyFiles2(lang);
+
+        if(dir.exists()){
+            System.out.println("폴더는 있넹");
+            String dataFilePath = dataPath + "/tessdata/"+lang+".traineddata";
+            System.out.println(dataFilePath);
+            File dataFile = new File(dataFilePath);
+            if(!dataFile.exists()){
+                copyFiles(lang);
             }
         }
-    }
-    //Process an Image
-    public void processImage() {
-        OCRThread ocrThread = new OCRThread(image);
-        ocrThread.setDaemon(true);
-        ocrThread.start();
     }
 }

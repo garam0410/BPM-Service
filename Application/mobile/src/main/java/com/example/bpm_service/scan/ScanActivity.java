@@ -7,7 +7,9 @@ import androidx.core.content.FileProvider;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -15,6 +17,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -24,10 +27,17 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.bpm_service.R;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -35,6 +45,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 
 public class ScanActivity extends AppCompatActivity {
@@ -50,29 +61,38 @@ public class ScanActivity extends AppCompatActivity {
     private TextView textView;
 
     private ProgressDialog progressDialog;
+    private IntentIntegrator qrScan;
 
     Bitmap image;
     private TessBaseAPI mTess;
     String dataPath = "";
 
+    String ocrApiGwUrl;
+    String ocrSecretKey;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
+        SharedPreferences sharedPreferences;
 
+        sharedPreferences = getSharedPreferences("PREF", Context.MODE_PRIVATE);
+        ocrApiGwUrl = sharedPreferences.getString("ocr_api_gw_url", "https://81530adfba1349cf83ce96ee4b6549a8.apigw.ntruss.com/custom/v1/10017/76900c26a46eb427dd3d2c8e453aabb0b43b93e80ceb037106524173d73ef18e/general");
+        ocrSecretKey = sharedPreferences.getString("ocr_secret_key", "QkJXcndkeW1UcHVaTlFTa3dOS3JYTmhUd3JtUmhLcVA=");
         progressDialog = new ProgressDialog(this);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("QR 영화 등록");
 
         // 촬영 시작
-        qrButton = (ImageButton) findViewById(R.id.qrStart);
+        qrButton = findViewById(R.id.qrStart);
 
         //결과 텍스트
-        textView = (TextView) findViewById(R.id.textView);
+        textView = findViewById(R.id.textView);
 
-        cancelButton = (Button) findViewById(R.id.cancel_button);
-        applyButton = (Button) findViewById(R.id.apply_button);
+        cancelButton = findViewById(R.id.cancel_button);
+        applyButton = findViewById(R.id.apply_button);
+
+        qrScan = new IntentIntegrator(this);
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,7 +105,7 @@ public class ScanActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 PermissionCheck();
-                sendTakePhotoIntent();
+                SendTakePhotoIntent();
             }
         });
 
@@ -98,6 +118,47 @@ public class ScanActivity extends AppCompatActivity {
                 startActivityForResult(intent, GET_GALLERY_IMAGE);
             }
         });
+    }
+
+    public class PapagoNmTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            return OcrProc.main(strings[0], strings[1], strings[2]);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            ReturnThreadResult(result);
+        }
+    }
+
+    public void ReturnThreadResult(String result){
+        System.out.println("### Return Thread Result");
+        String translateText = "";
+
+        String rlt = result;
+
+        try{
+            JSONObject jsonObject = new JSONObject(rlt);
+
+            JSONArray jsonArray = jsonObject.getJSONArray("images");
+
+            System.out.println(jsonArray);
+
+            for(int i = 0; i<jsonArray.length(); i++){
+                JSONArray jsonArray_fields = jsonArray.getJSONObject(i).getJSONArray("fields");
+
+                for(int j = 0; j<jsonArray_fields.length(); j++){
+                    String inferText = jsonArray_fields.getJSONObject(j).getString("inferText");
+                    translateText += inferText;
+                    translateText+= " ";
+                }
+            }
+            textView.setText(translateText);
+            progressDialog.cancel();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void PermissionCheck() {
@@ -121,12 +182,22 @@ public class ScanActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             image = BitmapFactory.decodeFile(imageFilePath);
+            RotateReady();
+            qrButton.setImageBitmap(image);
 
-            OCRReady();
+            progressDialog.setMessage("분석중....");
+            progressDialog.show();
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            image.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
+            byte[] bytes = byteArrayOutputStream.toByteArray();
+            String temp = Base64.getEncoder().encodeToString(bytes);
+
+            ScanActivity.PapagoNmTask papagoNmTask = new PapagoNmTask();
+            papagoNmTask.execute(ocrApiGwUrl,ocrSecretKey, temp);
         }
 
         else if (requestCode == GET_GALLERY_IMAGE && resultCode == RESULT_OK && data != null && data.getData() != null) {
@@ -134,17 +205,27 @@ public class ScanActivity extends AppCompatActivity {
             Uri selectedImageUri = data.getData();
             try {
                 image = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
-                qrButton.setImageBitmap(image);
                 imageFilePath = selectedImageUri.getPath();
+                RotateReady();
+                qrButton.setImageBitmap(image);
 
-                OCRReady();
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                image.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
+                byte[] bytes = byteArrayOutputStream.toByteArray();
+                String temp = Base64.getEncoder().encodeToString(bytes);
+
+                ScanActivity.PapagoNmTask papagoNmTask = new PapagoNmTask();
+                papagoNmTask.execute(ocrApiGwUrl,ocrSecretKey, temp);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        else{
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
-    private void OCRReady(){
+    private void RotateReady(){
         ExifInterface exif = null;
 
         try {
@@ -158,33 +239,14 @@ public class ScanActivity extends AppCompatActivity {
 
         if (exif != null) {
             exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-            exifDegree = exifOrientationToDegrees(exifOrientation);
+            exifDegree = ExifOrientationToDegrees(exifOrientation);
         } else {
             exifDegree = 0;
         }
-        progressDialog.setMessage("분석중입니다....");
-        progressDialog.show();
-
-        //언어파일 경로
-        dataPath = getFilesDir() + "/tesseract/";
-        System.out.println(getFilesDir());
-
-        //트레이닝 데이터가 카피되어 있는지 체크
-        checkFile(new File(dataPath + "tessdata/"),"eng");
-        checkFile(new File(dataPath + "tessdata/"),"kor");
-
-        // 변환 언어 선택
-        String lang = "eng+kor";
-
-        //OCR 세팅
-        mTess = new TessBaseAPI();
-        mTess.init(dataPath,lang);
-        image = rotate(image, exifDegree);
-        qrButton.setImageBitmap(image);
-        processImage();
+        image = Rotate(image, exifDegree);
     }
 
-    private int exifOrientationToDegrees(int exifOrientation) {
+    private int ExifOrientationToDegrees(int exifOrientation) {
         if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
             return 90;
         } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
@@ -195,18 +257,18 @@ public class ScanActivity extends AppCompatActivity {
         return 0;
     }
 
-    private Bitmap rotate(Bitmap bitmap, float degree) {
+    private Bitmap Rotate(Bitmap bitmap, float degree) {
         Matrix matrix = new Matrix();
         matrix.postRotate(degree);
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
-    private void sendTakePhotoIntent() {
+    private void SendTakePhotoIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             File photoFile = null;
             try {
-                photoFile = createImageFile();
+                photoFile = CreateImageFile();
             } catch (IOException ex) {
                 // Error occurred while creating the File
             }
@@ -219,7 +281,7 @@ public class ScanActivity extends AppCompatActivity {
         }
     }
 
-    private File createImageFile() throws IOException {
+    private File CreateImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "TEST_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
@@ -230,59 +292,5 @@ public class ScanActivity extends AppCompatActivity {
         );
         imageFilePath = image.getAbsolutePath();
         return image;
-    }
-
-    // 이미지에서 텍스트 읽기
-    public void processImage(){
-        String OCRresult = null;
-        mTess.setImage(image);
-        OCRresult = mTess.getUTF8Text();
-
-        textView.setText(OCRresult);
-        progressDialog.cancel();
-    }
-
-    //언어 데이터 파일, 디바이스에 복사
-    private void copyFiles(String lang){
-        try{
-
-            String filePath = dataPath + "/tessdata/"+lang+".traineddata";
-            AssetManager assetManager = this.getAssets();
-            InputStream inputStream = assetManager.open("tessdata/"+lang+".traineddata");
-            OutputStream outputStream = new FileOutputStream(filePath);
-            byte[] buffer = new byte[1024];
-
-            int read;
-            while((read = inputStream.read(buffer)) != -1){
-                outputStream.write(buffer, 0, read);
-            }
-
-            outputStream.flush();
-            outputStream.close();
-            inputStream.close();
-
-        }catch(FileNotFoundException e){
-            e.printStackTrace();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-    }
-
-    //언어 데이터 파일 존재 유무 체크
-    private void checkFile(File dir, String lang){
-        if(!dir.exists() && dir.mkdirs()){
-            System.out.println("파일도 없고 폴더도없어용");
-            copyFiles(lang);
-        }
-
-        if(dir.exists()){
-            System.out.println("폴더는 있넹");
-            String dataFilePath = dataPath + "/tessdata/"+lang+".traineddata";
-            System.out.println(dataFilePath);
-            File dataFile = new File(dataFilePath);
-            if(!dataFile.exists()){
-                copyFiles(lang);
-            }
-        }
     }
 }

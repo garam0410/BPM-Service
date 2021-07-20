@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.bpm_service.home.HomeActivity;
 import com.example.bpm_service.minfo.MInfoActivity;
@@ -31,6 +32,9 @@ public class MainActivity extends AppCompatActivity {
 
     //QR 버튼
     private ImageButton qrButton;
+
+    //심박수 측정 버튼
+    private ImageButton heartButton;
 
     // fragment로 지정할 Activity
     private HomeActivity fragment_home;
@@ -113,6 +117,16 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent qr = new Intent(getApplicationContext(), ScanActivity.class);
                 startActivity(qr);
+            }
+        });
+
+        heartButton = findViewById(R.id.heartButton);
+        heartButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String bpm = "70 79 32 78 3 ......";
+                System.out.println(bpm);
             }
         });
 

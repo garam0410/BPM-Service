@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#00000000"
     tools:context=".search.SearchActivity">
 
     <LinearLayout
@@ -40,12 +41,14 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:layout_margin="10dp">
 
         <ListView
             android:id="@+id/searchlist"
             android:layout_width="match_parent"
-            android:layout_height="fill_parent">
+            android:layout_height="fill_parent"
+            android:background="#66000000">
 
         </ListView>
 

@@ -25,13 +25,10 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.bpm_service.R;
 import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import org.json.JSONArray;
@@ -39,46 +36,26 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ScanActivity extends AppCompatActivity {
 
-    private static final int REQUEST_IMAGE_CAPTURE = 672;
-    private final int GET_GALLERY_IMAGE = 200;
-
-    private String imageFilePath;
-    private Uri photoUri;
-
-    private Button applyButton, cancelButton, loadButton;
+    private Button applyButton, cancelButton;
     private ImageButton qrButton;
-    private TextView textView;
+    private TextView titleText, timeText;
 
-    private ProgressDialog progressDialog;
-    private IntentIntegrator qrScan;
+    private String userId="";
+    private String translateText="";
 
-    Bitmap image;
-    private TessBaseAPI mTess;
-    String dataPath = "";
-
-    String ocrApiGwUrl;
-    String ocrSecretKey;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
-        SharedPreferences sharedPreferences;
-
-        sharedPreferences = getSharedPreferences("PREF", Context.MODE_PRIVATE);
-        ocrApiGwUrl = sharedPreferences.getString("ocr_api_gw_url", "https://81530adfba1349cf83ce96ee4b6549a8.apigw.ntruss.com/custom/v1/10017/76900c26a46eb427dd3d2c8e453aabb0b43b93e80ceb037106524173d73ef18e/general");
-        ocrSecretKey = sharedPreferences.getString("ocr_secret_key", "QkJXcndkeW1UcHVaTlFTa3dOS3JYTmhUd3JtUmhLcVA=");
-        progressDialog = new ProgressDialog(this);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("QR 영화 등록");
@@ -87,13 +64,21 @@ public class ScanActivity extends AppCompatActivity {
         qrButton = findViewById(R.id.qrStart);
 
         //결과 텍스트
-        textView = findViewById(R.id.textView);
+        titleText = findViewById(R.id.titleText);
+        timeText = (TextView) findViewById(R.id.timeText);
 
         cancelButton = findViewById(R.id.cancel_button);
         applyButton = findViewById(R.id.apply_button);
 
-        qrScan = new IntentIntegrator(this);
+        Intent intent = getIntent();
 
+        if(intent != null){
+            userId = intent.getStringExtra("userId");
+            translateText = intent.getStringExtra("translateText");
+            showData(translateText);
+        }
+
+        // 취소 버튼
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,196 +86,47 @@ public class ScanActivity extends AppCompatActivity {
             }
         });
 
+        // 적용 버튼
+        applyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        // 재인식 하기 위한 포스터 클릭 리스너
         qrButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PermissionCheck();
-                SendTakePhotoIntent();
+                Intent intent = new Intent(getApplicationContext(),ChooseScanActivity.class);
+                intent.putExtra("userId", userId);
+                startActivity(intent);
+                finish();
             }
         });
 
-        loadButton = (Button) findViewById(R.id.loadPicture);
-        loadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent. setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-                startActivityForResult(intent, GET_GALLERY_IMAGE);
-            }
-        });
+        titleText.setText(translateText);
     }
 
-    public class PapagoNmTask extends AsyncTask<String, String, String> {
-        @Override
-        protected String doInBackground(String... strings) {
-            return OcrProc.main(strings[0], strings[1], strings[2]);
+    public void showData(String data){
+        System.out.println(data);
+
+        // 영화 제목 처리
+
+
+        //시간 처리
+        data = data.replaceAll("\\(오전\\)","");
+        data = data.replaceAll("\\(오후\\)","");
+        data = data.replaceAll(" ","");
+
+        String movieTime = "";
+        Pattern p = Pattern.compile("\\d{2}:\\d{2}~\\d{2}:\\d{2}");
+        Matcher mMatcher = p.matcher(data);
+        if(mMatcher.find()){
+            movieTime = mMatcher.group();
+        }else{
+            System.out.println("찾을 수 없습니다");
         }
-
-        @Override
-        protected void onPostExecute(String result) {
-            ReturnThreadResult(result);
-        }
-    }
-
-    public void ReturnThreadResult(String result){
-        System.out.println("### Return Thread Result");
-        String translateText = "";
-
-        String rlt = result;
-
-        try{
-            JSONObject jsonObject = new JSONObject(rlt);
-
-            JSONArray jsonArray = jsonObject.getJSONArray("images");
-
-            System.out.println(jsonArray);
-
-            for(int i = 0; i<jsonArray.length(); i++){
-                JSONArray jsonArray_fields = jsonArray.getJSONObject(i).getJSONArray("fields");
-
-                for(int j = 0; j<jsonArray_fields.length(); j++){
-                    String inferText = jsonArray_fields.getJSONObject(j).getString("inferText");
-                    translateText += inferText;
-                    translateText+= " ";
-                }
-            }
-            textView.setText(translateText);
-            progressDialog.cancel();
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    public void PermissionCheck() {
-        /**
-         * 6.0 마시멜로우 이상일 경우에는 권한 체크후 권한을 요청한다.
-         */
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED &&
-                    checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED &&
-                    checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-                // 권한 없음
-                ActivityCompat.requestPermissions(ScanActivity.this,
-                        new String[]{Manifest.permission.CAMERA,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        2);
-            } else {
-                // 권한 있음
-            }
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            image = BitmapFactory.decodeFile(imageFilePath);
-            RotateReady();
-            qrButton.setImageBitmap(image);
-
-            progressDialog.setMessage("분석중....");
-            progressDialog.show();
-
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            image.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
-            byte[] bytes = byteArrayOutputStream.toByteArray();
-            String temp = Base64.getEncoder().encodeToString(bytes);
-
-            ScanActivity.PapagoNmTask papagoNmTask = new PapagoNmTask();
-            papagoNmTask.execute(ocrApiGwUrl,ocrSecretKey, temp);
-        }
-
-        else if (requestCode == GET_GALLERY_IMAGE && resultCode == RESULT_OK && data != null && data.getData() != null) {
-
-            Uri selectedImageUri = data.getData();
-            try {
-                image = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
-                imageFilePath = selectedImageUri.getPath();
-                RotateReady();
-                qrButton.setImageBitmap(image);
-
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                image.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
-                byte[] bytes = byteArrayOutputStream.toByteArray();
-                String temp = Base64.getEncoder().encodeToString(bytes);
-
-                ScanActivity.PapagoNmTask papagoNmTask = new PapagoNmTask();
-                papagoNmTask.execute(ocrApiGwUrl,ocrSecretKey, temp);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        else{
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    private void RotateReady(){
-        ExifInterface exif = null;
-
-        try {
-            exif = new ExifInterface(imageFilePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        int exifOrientation;
-        int exifDegree;
-
-        if (exif != null) {
-            exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-            exifDegree = ExifOrientationToDegrees(exifOrientation);
-        } else {
-            exifDegree = 0;
-        }
-        image = Rotate(image, exifDegree);
-    }
-
-    private int ExifOrientationToDegrees(int exifOrientation) {
-        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
-            return 90;
-        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
-            return 180;
-        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
-            return 270;
-        }
-        return 0;
-    }
-
-    private Bitmap Rotate(Bitmap bitmap, float degree) {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(degree);
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-    }
-
-    private void SendTakePhotoIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            File photoFile = null;
-            try {
-                photoFile = CreateImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-            }
-
-            if (photoFile != null) {
-                photoUri = FileProvider.getUriForFile(this, getPackageName(), photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-            }
-        }
-    }
-
-    private File CreateImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "TEST_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,      /* prefix */
-                ".jpg",         /* suffix */
-                storageDir          /* directory */
-        );
-        imageFilePath = image.getAbsolutePath();
-        return image;
+        timeText.setText(movieTime);
     }
 }

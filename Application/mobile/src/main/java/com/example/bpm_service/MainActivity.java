@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import com.example.bpm_service.home.HomeActivity;
 import com.example.bpm_service.minfo.MInfoActivity;
+import com.example.bpm_service.scan.ChooseScanActivity;
 import com.example.bpm_service.scan.ScanActivity;
 import com.example.bpm_service.search.SearchActivity;
 import com.example.bpm_service.uinfo.MyPageActivity;
@@ -115,7 +117,8 @@ public class MainActivity extends AppCompatActivity {
         qrButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent qr = new Intent(getApplicationContext(), ScanActivity.class);
+                Intent qr = new Intent(getApplicationContext(), ChooseScanActivity.class);
+                qr.putExtra("userId", userId);
                 startActivity(qr);
             }
         });

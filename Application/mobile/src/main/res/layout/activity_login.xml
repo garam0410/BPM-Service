@@ -5,23 +5,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@drawable/splash_theater"
     tools:context=".login.LoginActivity">
 
     <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="400dp"
-        android:src="@drawable/logo_splash"></ImageView>
+        android:layout_height="400dp"></ImageView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:background="#66000000"
+        android:padding="10dp">
 
         <Button
             android:id="@+id/findIdPw"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="70dp"
-            android:layout_marginEnd="32dp"
+            android:layout_marginEnd="24dp"
             android:background="@drawable/shape_round"
             android:text="ID/PW 찾기"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -32,10 +35,9 @@
             android:id="@+id/textView"
             android:layout_width="65dp"
             android:layout_height="wrap_content"
-            android:background="#ffffff"
             android:text="아이디"
             android:textAlignment="center"
-            android:textColor="#000000"
+            android:textColor="#ffffff"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -66,7 +68,7 @@
             android:layout_marginTop="16dp"
             android:text="비밀번호"
             android:textAlignment="center"
-            android:textColor="#000000"
+            android:textColor="#ffffff"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -94,9 +96,10 @@
             android:id="@+id/autoLoginCheck"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
+            android:background="#66000000"
             android:text="자동 로그인"
             app:layout_constraintBottom_toTopOf="@+id/Resister"
+            android:textColor="#ffffff"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.463"
             app:layout_constraintStart_toStartOf="parent"
@@ -107,7 +110,7 @@
             android:id="@+id/Login"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="70dp"
             android:background="@drawable/shape_round"
             android:text="로그인"
@@ -119,7 +122,9 @@
             android:id="@+id/Resister"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="70dp"
+            android:layout_marginEnd="32dp"
             android:background="@drawable/shape_round"
             android:text="회원가입"
             app:layout_constraintBottom_toBottomOf="parent"

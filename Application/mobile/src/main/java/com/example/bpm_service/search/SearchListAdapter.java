@@ -51,7 +51,7 @@ public class SearchListAdapter extends BaseAdapter {
 
         SearchListItem searchListItem = list.get(position);
 
-        Glide.with(convertView).load(searchListItem.getImage()).into(image);
+        Glide.with(convertView).load(searchListItem.getImage()).override(100,200).into(image);
         title.setText(searchListItem.getTitle());
         director.setText(searchListItem.getDirector());
         actor.setText((searchListItem.getActor()));

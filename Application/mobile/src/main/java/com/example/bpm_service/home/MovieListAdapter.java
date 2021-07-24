@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.bpm_service.R;
 
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 
         holder.textview.setText(item);
         holder.item.setTag(title);
-        Glide.with(holder.itemView.getContext()).load(image).into(holder.imageView);
+        Glide.with(holder.itemView.getContext()).load(image).override(100,200).into(holder.imageView);
         holder.item.setOnClickListener(onClickItem);
     }
 

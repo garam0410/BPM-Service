@@ -5,15 +5,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Movie;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +30,8 @@ import com.example.bpm_service.MainActivity;
 import com.example.bpm_service.R;
 import com.example.bpm_service.connection.MovieInformationServer;
 import com.example.bpm_service.connection.SocialServer;
+import com.example.bpm_service.dto.CommentDto;
+import com.example.bpm_service.login.LoginActivity;
 import com.google.android.material.tabs.TabLayout;
 
 import org.json.JSONArray;
@@ -31,7 +40,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MInfoActivity extends AppCompatActivity {
+public class MInfoActivity extends AppCompatActivity{
 
     private static String IP = "";
     private String userId;
@@ -84,7 +93,9 @@ public class MInfoActivity extends AppCompatActivity {
         summaryText = (TextView) findViewById(R.id.summaryText);
 
         poster = (ImageView) findViewById(R.id.poster);
+        reviewBar = (EditText) findViewById(R.id.reviewBar);
 
+        // 탭 눌렀을 때
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -110,6 +121,7 @@ public class MInfoActivity extends AppCompatActivity {
 //            public void onClick(View v) {
 //                SocialServer socialServer = new SocialServer(IP);
 //                //System.out.println(socialServer.selectCommentList("1"));
+
 //
 //                try {
 //                    JSONObject json = new JSONObject();
@@ -123,7 +135,44 @@ public class MInfoActivity extends AppCompatActivity {
 //            }
 //        });
 
-        reviewBar = (EditText) findViewById(R.id.reviewBar);
+        // 댓글 리스트 어댑터 설정
+        commentListAdapter = new CommentListAdapter();
+        commentList.setAdapter(commentListAdapter);
+
+        commentList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                // 팝업 메뉴 생성
+                PopupMenu popupMenu = new PopupMenu(MInfoActivity.this, view);
+                getMenuInflater().inflate(R.menu.comment_menu, popupMenu.getMenu());
+
+                final CommentDto commentItem = (CommentDto) commentListAdapter.getItem(position);
+                // 팝업 메뉴 클릭 이벤트 처리
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()){
+                            case R.id.action_modify:
+                                modifyAlertHandler("댓글 수정","수정할 댓글을 입력해주세요", commentItem.getCid().toString(), commentItem.getComment());
+                                break;
+                            case R.id.action_delete:
+                                deleteAlertHandler("댓글 삭제", "해당 댓글을 삭제하시겠습니까?", commentItem.getCid().toString());
+                                break;
+                            default :
+                                break;
+                        }
+                        return false;
+                    }
+                });
+                if(commentItem.getUserId().trim().equals(userId)){
+                    popupMenu.show();
+                }
+                return true;
+            }
+        });
+
+        // 댓글 등록 버튼 클릭 시
         insertReview = (Button) findViewById(R.id.insertReview);
         insertReview.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,18 +193,7 @@ public class MInfoActivity extends AppCompatActivity {
             }
         });
 
-        // 넘어온 값 가져오기
-        Intent intent = getIntent();
-        if(intent != null){
-            userId = intent.getStringExtra("userId");
-            title = intent.getStringExtra("title");
-            hotData = intent.getStringExtra("hotData");
-            if(hotData==null){
-                MovieInformationServer movieInformationServer = new MovieInformationServer(IP);
-                hotData = movieInformationServer.hotMovieRank();
-            }
-        }
-
+        //좋아요 버튼 클릭 시
         loveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -171,12 +209,20 @@ public class MInfoActivity extends AppCompatActivity {
             }
         });
 
-        System.out.println(title);
+        // 넘어온 값 가져오기
+        Intent intent = getIntent();
+        if(intent != null){
+            userId = intent.getStringExtra("userId");
+            title = intent.getStringExtra("title");
+            hotData = intent.getStringExtra("hotData");
+            if(hotData==null){
+                MovieInformationServer movieInformationServer = new MovieInformationServer(IP);
+                hotData = movieInformationServer.hotMovieRank();
+            }
+        }
 
+        // 영화 데이터 적용
         setData(title);
-
-        commentListAdapter = new CommentListAdapter();
-        commentList.setAdapter(commentListAdapter);
 
         // 리스트 초기화
         initHotdata(movieRankList,movieListAdapter_rank,hotData);
@@ -266,12 +312,14 @@ public class MInfoActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(decoration);
     }
 
-    public void setData(String title){
+    // 영화 데이터 적용 함수
+    public void setData(String getTitle){
         MovieInformationServer movieInformationServer = new MovieInformationServer(IP);
-        JSONObject data = movieInformationServer.getInfo(title, userId);
+        JSONObject data = movieInformationServer.getInfo(getTitle, userId);
 
         try {
-            titleText.setText((String)data.get("title"));
+            title = getTitle;
+            titleText.setText(getTitle);
             openText.setText((String)data.get("open"));
             genreText.setText((String)(data.get("genre") + " | " + data.get("runningtime")));
             directorText.setText((String)data.get("director"));
@@ -304,11 +352,71 @@ public class MInfoActivity extends AppCompatActivity {
         }
     };
 
-    private View.OnClickListener onClickCommentItem = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            System.out.println(v.getTag());
-            //setData((String)v.getTag());
-        }
-    };
+    // 수정 dialog
+    public void modifyAlertHandler(String alertTitle, String message, String cid, String comment){
+        EditText editText = new EditText(getApplicationContext());
+        FrameLayout container = new FrameLayout(MInfoActivity.this);
+        FrameLayout.LayoutParams params = new  FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        editText.setLayoutParams(params);
+        container.addView(editText);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MInfoActivity.this);
+        builder.setTitle(alertTitle).setMessage(message);
+        builder.setView(container);
+        editText.setText(comment);
+        builder.setPositiveButton("수정", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(editText.getText().toString().equals(comment)){
+                    initCommentData(title);
+                }else{
+                    SocialServer socialServer = new SocialServer(IP);
+                    try {
+                        JSONObject json = new JSONObject();
+                        json.put("title", title);
+                        json.put("userId", userId);
+                        json.put("comment", editText.getText().toString());
+                        socialServer.insertComment(cid,json.toString());
+                        initCommentData(title);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    // 삭제 dialog
+    public void deleteAlertHandler(String alertTitle, String message, String cid){
+        AlertDialog.Builder builder = new AlertDialog.Builder(MInfoActivity.this);
+        builder.setTitle(alertTitle).setMessage(message);
+
+        builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                SocialServer socialServer = new SocialServer(IP);
+                socialServer.deleteComment(cid);
+                initCommentData(title);
+            }
+        });
+        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
 }

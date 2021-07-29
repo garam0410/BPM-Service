@@ -15,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
-        <activity android:name=".scan.ChooseScanActivity"></activity>
+        <activity android:name=".heartrate.ConnectWearableActivity"></activity>
+        <activity android:name=".scan.ChooseScanActivity" />
         <activity android:name=".scan.ScanActivity" />
         <activity android:name=".minfo.MInfoActivity" />
         <activity android:name=".splash.SplashActivity">

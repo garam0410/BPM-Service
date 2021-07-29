@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.example.bpm_service.heartrate.ConnectWearableActivity;
 import com.example.bpm_service.home.HomeActivity;
 import com.example.bpm_service.minfo.MInfoActivity;
 import com.example.bpm_service.scan.ChooseScanActivity;
@@ -128,8 +129,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                String bpm = "70 79 32 78 3 ......";
-                System.out.println(bpm);
+                Intent intent = new Intent(getApplicationContext(),ConnectWearableActivity.class);
+                startActivity(intent);
             }
         });
 

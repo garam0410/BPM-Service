@@ -31,7 +31,7 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
-public class DataLayerListenerService implements MessageClient.OnMessageReceivedListener{
+public class DataLayerListenerService extends WearableListenerService {
 
     private static final String TAG = "DataLayerService";
 
@@ -40,15 +40,40 @@ public class DataLayerListenerService implements MessageClient.OnMessageReceived
     public static final String COUNT_PATH = "/count";
 
     @Override
-    public void onMessageReceived(MessageEvent messageEvent) {
-        Log.d(TAG, "onMessageReceived: " + messageEvent.getData());
-        final String message = new String((messageEvent.getData()));
-        // Check to see if the message is to start an activity
-        if (messageEvent.getPath().equals(START_ACTIVITY_PATH)) {
-//            Intent startIntent = new Intent(this, SplashActivity.class);
-//            startIntent.putExtra("message", message);
-//            startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            startActivity(startIntent);
+    public void onDataChanged(DataEventBuffer dataEvents) {
+        Log.d(TAG, "onDataChanged: " + dataEvents);
+
+        // Loop through the events and send a message back to the node that created the data item.
+        for (DataEvent event : dataEvents) {
+            Uri uri = event.getDataItem().getUri();
+            String path = uri.getPath();
+
+            if (COUNT_PATH.equals(path)) {
+                // Get the node id of the node that created the data item from the host portion of
+                // the uri.
+                String nodeId = uri.getHost();
+                // Set the data of the message to be the bytes of the Uri.
+                byte[] payload = uri.toString().getBytes();
+
+                // Send the rpc
+                // Instantiates clients without member variables, as clients are inexpensive to
+                // create. (They are cached and shared between GoogleApi instances.)
+                Task<Integer> sendMessageTask =
+                        Wearable.getMessageClient(this)
+                                .sendMessage(nodeId, DATA_ITEM_RECEIVED_PATH, payload);
+
+                sendMessageTask.addOnCompleteListener(
+                        new OnCompleteListener<Integer>() {
+                            @Override
+                            public void onComplete(Task<Integer> task) {
+                                if (task.isSuccessful()) {
+                                    Log.d(TAG, "Message sent successfully");
+                                } else {
+                                    Log.d(TAG, "Message failed.");
+                                }
+                            }
+                        });
+            }
         }
     }
 }

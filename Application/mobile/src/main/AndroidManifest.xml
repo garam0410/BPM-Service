@@ -15,7 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
-        <activity android:name=".heartrate.ConnectWearableActivity"></activity>
+        <activity android:name=".heartrate.ConnectWearableActivity"/>
         <activity android:name=".scan.ChooseScanActivity" />
         <activity android:name=".scan.ScanActivity" />
         <activity android:name=".minfo.MInfoActivity" />
@@ -43,18 +43,6 @@
                 android:resource="@xml/filepath" />
         </provider>
 
-        <service
-            android:name=".heartrate.DataLayerListenerService" >
-            <intent-filter>
-                <!-- listeners receive events that match the action and data filters -->
-                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
-                <data android:scheme="mobile" android:host="*" android:pathPrefix="/count"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
-                <data android:scheme="mobile" android:host="*" android:pathPrefix="/start-activity"/>
-            </intent-filter>
-        </service>
     </application>
 
 </manifest>

@@ -1,0 +1,54 @@
+/*
+ * Copyright (C) 2014 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.example.bpm_service.heartrate;
+
+import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
+
+import com.example.bpm_service.MainActivity;
+import com.example.bpm_service.splash.SplashActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.MessageClient;
+import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Wearable;
+import com.google.android.gms.wearable.WearableListenerService;
+
+public class DataLayerListenerService implements MessageClient.OnMessageReceivedListener{
+
+    private static final String TAG = "DataLayerService";
+
+    private static final String START_ACTIVITY_PATH = "/start-activity";
+    private static final String DATA_ITEM_RECEIVED_PATH = "/data-item-received";
+    public static final String COUNT_PATH = "/count";
+
+    @Override
+    public void onMessageReceived(MessageEvent messageEvent) {
+        Log.d(TAG, "onMessageReceived: " + messageEvent.getData());
+        final String message = new String((messageEvent.getData()));
+        // Check to see if the message is to start an activity
+        if (messageEvent.getPath().equals(START_ACTIVITY_PATH)) {
+//            Intent startIntent = new Intent(this, SplashActivity.class);
+//            startIntent.putExtra("message", message);
+//            startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            startActivity(startIntent);
+        }
+    }
+}

@@ -1,30 +1,53 @@
 package com.example.bpm_service;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.WorkerThread;
+
+import com.google.android.gms.common.api.GoogleApi;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.android.gms.wearable.DataClient;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.MessageClient;
+import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.Wearable;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
-public class MainActivity extends WearableActivity implements SensorEventListener {
+public class MainActivity extends WearableActivity implements SensorEventListener{
 
+    private static final String START_ACTIVITY_PATH = "/start-activity";
     public static final String WEARABLE_DATA_PATH = "/mypath";
     public static final String WEARABLE_DATA_PATH_Result = "/mypath/result";
 
     private TextView mTextView;
     private ArrayList<Integer> list;
     private SensorManager mSensorManager;
+
+    private String bpmData = "";
 
     private Button mBut;
 
@@ -39,14 +62,14 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         mBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                stopOnClick();
+                onStartMobileActivityClick();
             }
         });
 
 
         try {
             String message = getIntent().getStringExtra("message");
-            //String message = "startMonitoring";
+            message = "startMonitoring";
             if (message == null) {
                 mTextView.setText("The app must be launched from the mobile.");
                 try {
@@ -78,7 +101,8 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     private void stopOnClick() {
         mSensorManager.unregisterListener(this);
-        mTextView.setText("멈춥니다");
+        bpmData = bpmData.substring(0, bpmData.length()-1);
+        mTextView.setText(bpmData);
     }
 
     @Override
@@ -86,14 +110,12 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         if (event.sensor.getType() == Sensor.TYPE_HEART_RATE){
             String msg = (int) event.values[0] + " Bpm";
             mTextView.setText(msg);
-            list.add((int) event.values[0]);
+            bpmData += (int)event.values[0] + ",";
+            //list.add((int) event.values[0]);
             System.out.println(event.values[0]);  //이거 값을 전달해야
         }
 
     }
-
-    // intent.putExtra(RESULT_KEY, event.values[0]);
-
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -128,5 +150,71 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         String getTime = dateFormat.format(date);
         return getTime;
+    }
+    ///////////////////////////////////////////////////////////
+
+    /** Sends an RPC to start a fullscreen Activity on the wearable. */
+    public void onStartMobileActivityClick() {
+        System.out.println("mobile Start");
+        stopOnClick();
+
+        new StartWearableActivityTask().execute();
+    }
+
+    private class StartWearableActivityTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... args) {
+            Collection<String> nodes = getNodes();
+            System.out.println(nodes);
+            for (String node : nodes) {
+                System.out.println(node.getBytes());
+                sendStartActivityMessage(node);
+            }
+            return null;
+        }
+    }
+
+    @WorkerThread
+    private Collection<String> getNodes() {
+        HashSet<String> results = new HashSet<>();
+
+        Task<List<Node>> nodeListTask =
+                Wearable.getNodeClient(getApplicationContext()).getConnectedNodes();
+
+        try {
+            List<Node> nodes = Tasks.await(nodeListTask);
+
+            for (Node node : nodes) {
+                results.add(node.getId());
+                System.out.println(node.getDisplayName());
+            }
+
+        } catch (ExecutionException exception) {
+            System.out.println("Task failed : " + exception);
+
+        } catch (InterruptedException exception) {
+            System.out.println("Interrupt occurred : " + exception);
+        }
+
+        return results;
+    }
+
+    @WorkerThread
+    private void sendStartActivityMessage(String node) {
+
+        Task<Integer> sendMessageTask =
+                Wearable.getMessageClient(this).sendMessage(node, START_ACTIVITY_PATH, "startMonitoring".getBytes());
+
+        try {
+            Integer result = Tasks.await(sendMessageTask);
+            System.out.println("message sent : " + result);
+
+        } catch (ExecutionException exception) {
+            System.out.println("task failed : " + exception);
+
+        } catch (InterruptedException exception) {
+            System.out.println("interrupt occrurred : " + exception);
+        }
     }
 }

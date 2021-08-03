@@ -20,6 +20,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.example.bpm_service.MainActivity;
 import com.example.bpm_service.splash.SplashActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -40,40 +42,45 @@ public class DataLayerListenerService extends WearableListenerService {
     public static final String COUNT_PATH = "/count";
 
     @Override
-    public void onDataChanged(DataEventBuffer dataEvents) {
-        Log.d(TAG, "onDataChanged: " + dataEvents);
-
-        // Loop through the events and send a message back to the node that created the data item.
-        for (DataEvent event : dataEvents) {
-            Uri uri = event.getDataItem().getUri();
-            String path = uri.getPath();
-
-            if (COUNT_PATH.equals(path)) {
-                // Get the node id of the node that created the data item from the host portion of
-                // the uri.
-                String nodeId = uri.getHost();
-                // Set the data of the message to be the bytes of the Uri.
-                byte[] payload = uri.toString().getBytes();
-
-                // Send the rpc
-                // Instantiates clients without member variables, as clients are inexpensive to
-                // create. (They are cached and shared between GoogleApi instances.)
-                Task<Integer> sendMessageTask =
-                        Wearable.getMessageClient(this)
-                                .sendMessage(nodeId, DATA_ITEM_RECEIVED_PATH, payload);
-
-                sendMessageTask.addOnCompleteListener(
-                        new OnCompleteListener<Integer>() {
-                            @Override
-                            public void onComplete(Task<Integer> task) {
-                                if (task.isSuccessful()) {
-                                    Log.d(TAG, "Message sent successfully");
-                                } else {
-                                    Log.d(TAG, "Message failed.");
-                                }
-                            }
-                        });
-            }
-        }
+    public void onMessageReceived(MessageEvent messageEvent) {
+        System.out.println("받았다");
     }
+
+//    @Override
+//    public void onDataChanged(DataEventBuffer dataEvents) {
+//        Log.d(TAG, "onDataChanged: " + dataEvents);
+//
+//        // Loop through the events and send a message back to the node that created the data item.
+//        for (DataEvent event : dataEvents) {
+//            Uri uri = event.getDataItem().getUri();
+//            String path = uri.getPath();
+//
+//            if (COUNT_PATH.equals(path)) {
+//                // Get the node id of the node that created the data item from the host portion of
+//                // the uri.
+//                String nodeId = uri.getHost();
+//                // Set the data of the message to be the bytes of the Uri.
+//                byte[] payload = uri.toString().getBytes();
+//
+//                // Send the rpc
+//                // Instantiates clients without member variables, as clients are inexpensive to
+//                // create. (They are cached and shared between GoogleApi instances.)
+//                Task<Integer> sendMessageTask =
+//                        Wearable.getMessageClient(this)
+//                                .sendMessage(nodeId, DATA_ITEM_RECEIVED_PATH, payload);
+//
+//                sendMessageTask.addOnCompleteListener(
+//                        new OnCompleteListener<Integer>() {
+//                            @Override
+//                            public void onComplete(Task<Integer> task) {
+//                                if (task.isSuccessful()) {
+//                                    Log.d(TAG, "Message sent successfully");
+//                                } else {
+//                                    Log.d(TAG, "Message failed.");
+//                                }
+//                            }
+//                        });
+//            }
+//        }
+//    }
 }

@@ -19,6 +19,7 @@ import androidx.annotation.WorkerThread;
 
 import com.google.android.gms.common.api.GoogleApi;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.gms.wearable.DataClient;
@@ -204,7 +205,14 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     private void sendStartActivityMessage(String node) {
 
         Task<Integer> sendMessageTask =
-                Wearable.getMessageClient(this).sendMessage(node, START_ACTIVITY_PATH, "startMonitoring".getBytes());
+                Wearable.getMessageClient(this).sendMessage(node, START_ACTIVITY_PATH, bpmData.getBytes());
+
+        sendMessageTask.addOnSuccessListener(new OnSuccessListener<Integer>() {
+            @Override
+            public void onSuccess(Integer integer) {
+                System.out.println("message sent success");
+            }
+        });
 
         try {
             Integer result = Tasks.await(sendMessageTask);

@@ -1,5 +1,6 @@
 package com.example.bpm_service.heartrate;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -36,10 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class ConnectWearableActivity extends AppCompatActivity implements
-        DataClient.OnDataChangedListener,
-        MessageClient.OnMessageReceivedListener,
-        CapabilityClient.OnCapabilityChangedListener{
+public class ConnectWearableActivity extends AppCompatActivity{
 
     private TextView mTextView;
 
@@ -52,28 +50,16 @@ public class ConnectWearableActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_connect_wearable);
 
         mTextView = (TextView) findViewById(R.id.textView5);
-
+        Intent intent =getIntent();
+        if(intent!=null){
+            mTextView.setText(intent.getStringExtra("bpmData"));
+        }
     }
 
     public void onStartWearableActivityClick(View view) {
         System.out.println("wearable Start");
 
         new StartWearableActivityTask().execute();
-    }
-
-    @Override
-    public void onCapabilityChanged(CapabilityInfo capabilityInfo) {
-
-    }
-
-    @Override
-    public void onDataChanged(DataEventBuffer dataEventBuffer) {
-
-    }
-
-    @Override
-    public void onMessageReceived(MessageEvent messageEvent) {
-        System.out.println(messageEvent.getRequestId());
     }
 
     private class StartWearableActivityTask extends AsyncTask<Void, Void, Void> {

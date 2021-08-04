@@ -21,6 +21,7 @@ import com.example.bpm_service.heartrate.ConnectWearableActivity;
 import com.example.bpm_service.home.HomeActivity;
 import com.example.bpm_service.minfo.MInfoActivity;
 import com.example.bpm_service.scan.ChooseScanActivity;
+import com.example.bpm_service.scan.QrActivity;
 import com.example.bpm_service.scan.ScanActivity;
 import com.example.bpm_service.search.SearchActivity;
 import com.example.bpm_service.uinfo.MyPageActivity;
@@ -127,19 +128,9 @@ public class MainActivity extends AppCompatActivity  implements
         qrButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent qr = new Intent(getApplicationContext(), ChooseScanActivity.class);
+                Intent qr = new Intent(getApplicationContext(), QrActivity.class);
                 qr.putExtra("userId", userId);
                 startActivity(qr);
-            }
-        });
-
-        heartButton = findViewById(R.id.heartButton);
-        heartButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent intent = new Intent(getApplicationContext(),ConnectWearableActivity.class);
-                startActivity(intent);
             }
         });
 

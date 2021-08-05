@@ -7,9 +7,11 @@
     android:background="#00000000"
     tools:context=".uinfo.MyPageActivity">
 
-    <TextView
+    <Button
+        android:id="@+id/logout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="마이페이지입니다."></TextView>
+        android:text="로그아웃">
+    </Button>
 
 </LinearLayout>

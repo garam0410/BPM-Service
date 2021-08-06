@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -23,13 +22,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
 import com.example.bpm_service.R;
 import com.google.zxing.integration.android.IntentIntegrator;
-import com.googlecode.tesseract.android.TessBaseAPI;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,7 +37,7 @@ import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
 
-public class ChooseScanActivity extends AppCompatActivity {
+public class ChooseScanActivity_analysis extends AppCompatActivity {
 
     private static final int REQUEST_IMAGE_CAPTURE = 672;
     private final int GET_GALLERY_IMAGE = 200;
@@ -155,7 +151,7 @@ public class ChooseScanActivity extends AppCompatActivity {
                     checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED &&
                     checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
                 // 권한 없음
-                ActivityCompat.requestPermissions(ChooseScanActivity.this,
+                ActivityCompat.requestPermissions(ChooseScanActivity_analysis.this,
                         new String[]{Manifest.permission.CAMERA,
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         2);
@@ -177,7 +173,7 @@ public class ChooseScanActivity extends AppCompatActivity {
             byte[] bytes = byteArrayOutputStream.toByteArray();
             String temp = Base64.getEncoder().encodeToString(bytes);
 
-            ChooseScanActivity.PapagoNmTask papagoNmTask = new PapagoNmTask();
+            ChooseScanActivity_analysis.PapagoNmTask papagoNmTask = new PapagoNmTask();
             papagoNmTask.execute(ocrApiGwUrl,ocrSecretKey, temp);
         }
 
@@ -194,7 +190,7 @@ public class ChooseScanActivity extends AppCompatActivity {
                 byte[] bytes = byteArrayOutputStream.toByteArray();
                 String temp = Base64.getEncoder().encodeToString(bytes);
 
-                ChooseScanActivity.PapagoNmTask papagoNmTask = new PapagoNmTask();
+                ChooseScanActivity_analysis.PapagoNmTask papagoNmTask = new PapagoNmTask();
                 papagoNmTask.execute(ocrApiGwUrl,ocrSecretKey, temp);
             } catch (IOException e) {
                 e.printStackTrace();

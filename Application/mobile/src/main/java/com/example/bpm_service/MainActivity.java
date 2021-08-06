@@ -8,21 +8,18 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.example.bpm_service.heartrate.ConnectWearableActivity;
 import com.example.bpm_service.home.HomeActivity;
 import com.example.bpm_service.minfo.MInfoActivity;
 import com.example.bpm_service.scan.ChooseScanActivity;
 import com.example.bpm_service.scan.QrActivity;
-import com.example.bpm_service.scan.ScanActivity;
 import com.example.bpm_service.search.SearchActivity;
 import com.example.bpm_service.uinfo.MyPageActivity;
 import com.google.android.gms.wearable.CapabilityClient;
@@ -128,7 +125,7 @@ public class MainActivity extends AppCompatActivity  implements
         qrButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent qr = new Intent(getApplicationContext(), QrActivity.class);
+                Intent qr = new Intent(getApplicationContext(), ChooseScanActivity.class);
                 qr.putExtra("userId", userId);
                 startActivity(qr);
             }

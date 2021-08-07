@@ -44,5 +44,9 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:26.+'
     implementation 'com.rmtheis:tess-two:9.1.0'
     compile 'com.journeyapps:zxing-android-embedded:3.4.0'
+    implementation 'android.arch.navigation:navigation-fragment:1.0.0-alpha07'
+    implementation 'android.arch.navigation:navigation-ui-ktx:1.0.0-alpha07'
+    implementation "androidx.navigation:navigation-fragment:2.2.0-rc03"
+    implementation "androidx.navigation:navigation-ui:2.2.0-rc03"
     wearApp project(":wear")
 }

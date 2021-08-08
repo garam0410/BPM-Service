@@ -69,4 +69,18 @@ public class MovieInformationServer {
             return null;
         }
     }
+
+    // 영화 좋아요 목록
+    public String getLoveMovie(String userId){
+        try {
+            url += "8081/getlovemovie?userId=" + userId;
+            return new GetTask().execute(url).get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            return "ExecutionError";
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return "InterruptedError";
+        }
+    }
 }

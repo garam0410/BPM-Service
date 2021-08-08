@@ -346,9 +346,9 @@ public class MInfoActivity extends AppCompatActivity{
         public void onClick(View v) {
             setData((String)v.getTag());
             initCommentData((String)v.getTag());
-            detailPage.setVisibility(View.VISIBLE) ;
-            reviewPage.setVisibility(View.INVISIBLE) ;
-            tabLayout.selectTab(changeIndex);
+//            detailPage.setVisibility(View.VISIBLE) ;
+//            reviewPage.setVisibility(View.INVISIBLE) ;
+//            tabLayout.selectTab(changeIndex);
         }
     };
 

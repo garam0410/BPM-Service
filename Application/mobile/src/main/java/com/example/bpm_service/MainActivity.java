@@ -156,6 +156,7 @@ public class MainActivity extends AppCompatActivity  implements
             case 2 :
                 Bundle bundle_3 = new Bundle();
                 bundle_3.putBoolean("SAVE_LOGIN_DATA", SAVE_LOGIN_DATA);
+                bundle_3.putString("userId", userId);
                 fragment_myPage.setArguments(bundle_3);
                 transaction.replace(R.id.mainFrame, fragment_myPage);
                 transaction.commit();

@@ -60,6 +60,23 @@
             android:scrollbars="horizontal">
 
         </androidx.recyclerview.widget.RecyclerView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="30dp"
+            android:text="내가 상영한 영화"
+            android:padding="10dp"></TextView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:padding="10dp"
+            android:id="@+id/watchMovieList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="horizontal">
+
+        </androidx.recyclerview.widget.RecyclerView>
     </LinearLayout>
 
 

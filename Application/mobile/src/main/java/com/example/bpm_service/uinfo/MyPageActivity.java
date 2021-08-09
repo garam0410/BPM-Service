@@ -33,13 +33,15 @@ public class MyPageActivity extends Fragment {
 
     private String userId;
     private String IP;
-    private String movieList;
+    private String loveList, watchList;
 
     private Button logout, reservationMovie;
     private boolean SAVE_LOGIN_DATA;
 
-    private RecyclerView loveMovieList;
-    private MovieListAdapter movieListAdapter;
+    private RecyclerView loveMovieList, watchMovieList;
+    private MovieListAdapter loveMovieListAdapter;
+    private MovieListAdapter watchMovieListAdapter;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle saveInstanceState){
         View view = inflater.inflate(R.layout.activity_mypage, container, false);
@@ -54,10 +56,8 @@ public class MyPageActivity extends Fragment {
         Bundle bundle = getArguments();
         userId = bundle.getString("userId");
 
-        MovieInformationServer movieInformationServer = new MovieInformationServer(IP);
-        movieList = movieInformationServer.getLoveMovie(userId);
-
         loveMovieList = view.findViewById(R.id.loveMovieList);
+        watchMovieList = view.findViewById(R.id.watchMovieList);
 
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,7 +92,13 @@ public class MyPageActivity extends Fragment {
             }
         });
 
-        init(loveMovieList, movieListAdapter, movieList);
+        MovieInformationServer movieInformationServer_1 = new MovieInformationServer(IP);
+        loveList = movieInformationServer_1.getLoveMovie(userId);
+        init(loveMovieList, loveMovieListAdapter, loveList);
+
+        MovieInformationServer movieInformationServer_2 = new MovieInformationServer(IP);
+        watchList = movieInformationServer_2.getWatchMovie(userId);
+        init(watchMovieList, watchMovieListAdapter, watchList);
 
         return view;
     }

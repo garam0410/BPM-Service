@@ -83,4 +83,18 @@ public class MovieInformationServer {
             return "InterruptedError";
         }
     }
+
+    // 시청한 영화 목록
+    public String getWatchMovie(String userId){
+        try {
+            url += "8081/getwatchmovie?userId=" + userId;
+            return new GetTask().execute(url).get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            return "ExecutionError";
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return "InterruptedError";
+        }
+    }
 }

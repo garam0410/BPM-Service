@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:text="Title"
             android:layout_marginTop="10dp"
-            android:id="@+id/textViewName"
+            android:id="@+id/movieTitle"
             android:layout_gravity="center"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
 
@@ -46,7 +46,16 @@
             android:layout_height="wrap_content"
             android:text="Date"
             android:layout_gravity="center"
-            android:id="@+id/textViewAddress"
+            android:id="@+id/movieDate"
+            android:layout_marginTop="5dp"
+            android:textSize="20dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time"
+            android:layout_gravity="center"
+            android:id="@+id/movieTime"
             android:layout_marginTop="5dp"
             android:textSize="20dp"/>
 
@@ -59,4 +68,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:id="@+id/buttonScan" />
+
+    <Button
+        android:id="@+id/bpmStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="측정 예약" />
 </LinearLayout>

@@ -31,10 +31,7 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class MainActivity extends AppCompatActivity  implements
-        DataClient.OnDataChangedListener,
-        MessageClient.OnMessageReceivedListener,
-        CapabilityClient.OnCapabilityChangedListener{
+public class MainActivity extends AppCompatActivity{
 
     private BottomNavigationView bottomNavigationView;
 
@@ -95,7 +92,7 @@ public class MainActivity extends AppCompatActivity  implements
         fragment_home = new HomeActivity();
         fragment_myPage = new MyPageActivity();
         fragment_minfo = new MInfoActivity();
-        Wearable.getMessageClient(this).addListener(this);
+        //Wearable.getMessageClient(this).addListener(this);
         //첫화면을 홈으로
         setFrag(1);
     }
@@ -163,28 +160,28 @@ public class MainActivity extends AppCompatActivity  implements
                 break;
         }
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Wearable.getMessageClient(this).addListener(this);
-    }
-
-    @Override
-    public void onMessageReceived(MessageEvent messageEvent) {
-        System.out.println("진짜 메시지 받았다");
-        Intent intent = new Intent(this,ConnectWearableActivity.class);
-        intent.putExtra("bpmData", new String((messageEvent.getData())));
-        startActivity(intent);
-    }
-
-    @Override
-    public void onCapabilityChanged(CapabilityInfo capabilityInfo) {
-        System.out.println("메시지 받았다");
-    }
-
-    @Override
-    public void onDataChanged(DataEventBuffer dataEventBuffer) {
-        System.out.println("메시지 받았다");
-    }
+//
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        Wearable.getMessageClient(this).addListener(this);
+//    }
+//
+//    @Override
+//    public void onMessageReceived(MessageEvent messageEvent) {
+//        System.out.println("진짜 메시지 받았다");
+//        Intent intent = new Intent(this,ConnectWearableActivity.class);
+//        intent.putExtra("bpmData", new String((messageEvent.getData())));
+//        startActivity(intent);
+//    }
+//
+//    @Override
+//    public void onCapabilityChanged(CapabilityInfo capabilityInfo) {
+//        System.out.println("메시지 받았다");
+//    }
+//
+//    @Override
+//    public void onDataChanged(DataEventBuffer dataEventBuffer) {
+//        System.out.println("메시지 받았다");
+//    }
 }

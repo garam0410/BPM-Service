@@ -3,7 +3,10 @@ package com.example.bpm_service.scan;
 import androidx.annotation.WorkerThread;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -15,7 +18,9 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.bpm_service.R;
 import com.example.bpm_service.connection.MovieInformationServer;
+import com.example.bpm_service.heartrate.BpmTransactionService;
 import com.example.bpm_service.heartrate.ConnectWearableActivity;
+import com.example.bpm_service.login.LoginActivity;
 import com.example.bpm_service.minfo.MInfoActivity;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -27,6 +32,7 @@ import com.google.zxing.integration.android.IntentResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -34,15 +40,19 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class QrActivity extends AppCompatActivity {
-    private TextView movieTitle, movieTime;
-    private Button buttonScan;
+    private TextView movieTitle, movieTime, movieDate;
+    private Button buttonScan, bpmStart;
     private IntentIntegrator qrScan;
     private ImageButton movieImage;
 
-    private String title, image, time;
+    private String title, image, time, date;
     private String IP ="";
     private String data = "";
     private String userId = "";
+
+    //측정 예약 정보
+    private SharedPreferences reservationData;
+    private boolean reservationState;
 
     private static final String START_ACTIVITY_PATH = "/start-activity";
 
@@ -54,8 +64,10 @@ public class QrActivity extends AppCompatActivity {
         IP = getResources().getString(R.string.IP);
 
         buttonScan = (Button) findViewById(R.id.buttonScan);
-        movieTitle = (TextView) findViewById(R.id.textViewName);
-        movieTime = (TextView) findViewById(R.id.textViewAddress);
+        bpmStart = (Button) findViewById(R.id.bpmStart);
+        movieTitle = (TextView) findViewById(R.id.movieTitle);
+        movieDate = (TextView) findViewById(R.id.movieDate);
+        movieTime = (TextView) findViewById(R.id.movieTime);
 
         movieImage = (ImageButton) findViewById(R.id.movieImage);
 
@@ -68,6 +80,43 @@ public class QrActivity extends AppCompatActivity {
         buttonScan.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 qrScan.initiateScan();
+            }
+        });
+
+        bpmStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(QrActivity.this).setTitle(title).setMessage(time + "\n 측정예약 하시겠습니까?")
+                        .setPositiveButton("예약", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(QrActivity.this, BpmTransactionService.class);
+                                intent.putExtra("bpmStart",true);
+                                intent.putExtra("IP", IP);
+                                intent.putExtra("userId", userId);
+                                intent.putExtra("title", title);
+                                startService(intent);
+
+                                reservationData = getSharedPreferences("reservationData", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = reservationData.edit();
+
+                                reservationState = true;
+
+                                editor.putString("userId", userId);
+                                editor.putString("title",title);
+                                editor.putString("time",time);
+                                editor.putString("date",date);
+                                editor.putString("image",image);
+                                editor.putBoolean("reservationState", reservationState);
+                                editor.apply();
+
+                            }
+                        }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).show();
             }
         });
 
@@ -99,9 +148,11 @@ public class QrActivity extends AppCompatActivity {
                 try {
                     //data를 json으로 변환
                     JSONObject obj = new JSONObject(result.getContents());
-                    title = obj.getString("name");
+                    title = obj.getString("title");
+                    date = obj.getString("date");
                     time = obj.getString("time");
                     movieTitle.setText(title);
+                    movieDate.setText(date);
                     movieTime.setText(time);
 
                     getImage(title);

@@ -88,7 +88,11 @@ public class MyPageActivity extends Fragment {
         reservationMovie.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                SharedPreferences reservationData = getActivity().getSharedPreferences("reservationData", Activity.MODE_PRIVATE);
+                if(reservationData.getBoolean("reservationState",false) == true){
+                    Intent intent = new Intent(getActivity(), ReservationActivity.class);
+                    startActivity(intent);
+                }
             }
         });
 

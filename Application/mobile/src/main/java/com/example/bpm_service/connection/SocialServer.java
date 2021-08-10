@@ -55,4 +55,18 @@ public class SocialServer {
             return null;
         }
     }
+
+    // 심박수 데이터 전송
+    public String sendBpm(String bpmData){
+        try {
+            url += "8082/bpmsend/";
+            return new PostTask().execute(url, bpmData).get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            return "ExecutionError";
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return "InterruptedError";
+        }
+    }
 }

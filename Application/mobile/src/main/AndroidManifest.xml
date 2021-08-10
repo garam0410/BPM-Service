@@ -15,7 +15,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
-        <activity android:name=".scan.QrActivity"></activity>
+        <activity android:name=".uinfo.ReservationActivity"></activity>
+
+        <service
+            android:name=".heartrate.BpmTransactionService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".scan.QrActivity" />
         <activity android:name=".heartrate.ConnectWearableActivity" />
         <activity android:name=".scan.ChooseScanActivity" />
         <activity android:name=".scan.ScanActivity" />

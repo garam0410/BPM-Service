@@ -1,5 +1,6 @@
 package com.example.bpm_service.heartrate;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -39,6 +40,7 @@ import java.util.concurrent.ExecutionException;
 
 public class ConnectWearableActivity extends AppCompatActivity{
 
+    private static Context context;
     private TextView mTextView;
 
     public static final String WEARABLE_DATA_PATH= "/mypath";
@@ -48,15 +50,16 @@ public class ConnectWearableActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect_wearable);
-
-        mTextView = (TextView) findViewById(R.id.textView5);
-        Intent intent =getIntent();
-        if(intent!=null){
-            mTextView.setText(intent.getStringExtra("bpmData"));
-        }
+        context = this;
+//
+//        mTextView = (TextView) findViewById(R.id.textView5);
+//        Intent intent =getIntent();
+//        if(intent!=null){
+//            mTextView.setText(intent.getStringExtra("bpmData"));
+//        }
     }
 
-    public void onStartWearableActivityClick(View view) {
+    public void onStartWearableActivityClick() {
         System.out.println("wearable Start");
 
         new StartWearableActivityTask().execute();

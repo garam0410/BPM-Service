@@ -95,6 +95,7 @@ public class QrActivity extends AppCompatActivity {
                                 intent.putExtra("IP", IP);
                                 intent.putExtra("userId", userId);
                                 intent.putExtra("title", title);
+                                intent.putExtra("time",time);
                                 startService(intent);
 
                                 reservationData = getSharedPreferences("reservationData", MODE_PRIVATE);

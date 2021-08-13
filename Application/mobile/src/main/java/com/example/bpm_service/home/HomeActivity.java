@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 
 public class HomeActivity extends Fragment {
 
+    public static Context context;
     private RecyclerView movieRankList, userRankList;
     public MovieListAdapter movieListAdapter_rank;
     public MovieListAdapter movieListAdapter_user;
@@ -40,6 +42,8 @@ public class HomeActivity extends Fragment {
         String IP = getResources().getString(R.string.IP);
         //String IP = "http://61.245.226.112:";
 
+        context = getActivity();
+
         movieRankList = view.findViewById(R.id.hotMovieRank);
         userRankList = view.findViewById(R.id.userMovieRank);
 
@@ -48,7 +52,7 @@ public class HomeActivity extends Fragment {
 
         MovieInformationServer movieInformationServer = new MovieInformationServer(IP);
 
-        hotData = movieInformationServer.hotMovieRank();
+        hotData = movieInformationServer.hotMovieRank(context);
         //String userData = movieInformationServer.userMovieRank();
 
         init(movieRankList,movieListAdapter_rank, hotData);

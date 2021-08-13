@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,6 +35,8 @@ public class LoginActivity extends AppCompatActivity {
     // EditText 값 변수 선언
     String userId, userPw;
 
+    private Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +45,8 @@ public class LoginActivity extends AppCompatActivity {
         //상단바 숨기기
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
+
+        context = this;
 
         // 로딩 정의
         progressDialog = new ProgressDialog(this);
@@ -137,7 +142,7 @@ public class LoginActivity extends AppCompatActivity {
             UserManagementServer userManagementServer = new UserManagementServer(IP);
 
             // 통신 결과 반환
-            String result = userManagementServer.login(userId, userPw);
+            String result = userManagementServer.login(context, userId, userPw);
 
             //로그인 성공
             if(result.trim().equals("Success")){

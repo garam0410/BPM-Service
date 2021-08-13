@@ -1,5 +1,7 @@
 package com.example.bpm_service.connection;
 
+import android.content.Context;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,7 +31,7 @@ public class SocialServer {
     }
 
     // 댓글 삭제
-    public String deleteComment(String cid){
+    public String deleteComment(Context context, String cid){
         try {
             url += "8082/comments/delete/"+cid;
             return new GetTask().execute(url).get();
@@ -43,7 +45,7 @@ public class SocialServer {
     }
 
     // 댓글 목록 조회
-    public JSONArray selectCommentList(String title){
+    public JSONArray selectCommentList(Context context, String title){
         try {
             url += "8082/comments/"+title;
             data = new GetTask().execute(url).get();

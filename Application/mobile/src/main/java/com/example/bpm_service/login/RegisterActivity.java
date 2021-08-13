@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
@@ -26,6 +27,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Button cancel_button, register_button;
 
     private ProgressDialog progressDialog;
+    private Context context;
 
     // 입력값을 저장할 변수
     private String uname, userId, userPw, userPwCheck, usex, userEmail, unumber;
@@ -38,6 +40,8 @@ public class RegisterActivity extends AppCompatActivity {
         //상단바 숨기기
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
+
+        context = this;
 
         // 로딩 정의
         progressDialog = new ProgressDialog(this);
@@ -107,7 +111,7 @@ public class RegisterActivity extends AppCompatActivity {
                     progressDialog.show();
 
                     UserManagementServer userManagementServer = new UserManagementServer(IP);
-                    String result = userManagementServer.register(uname, userId, userPw, usex, userEmail,unumber);
+                    String result = userManagementServer.register(context, uname, userId, userPw, usex, userEmail,unumber);
 
                     // 회원가입 성공
                     if(result.trim().equals("Success")){

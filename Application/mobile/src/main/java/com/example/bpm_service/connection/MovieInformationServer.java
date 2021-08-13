@@ -1,5 +1,7 @@
 package com.example.bpm_service.connection;
 
+import android.content.Context;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,7 +17,7 @@ public class MovieInformationServer {
     }
 
     //검색
-    public String search(String query){
+    public String search(Context context, String query){
         try {
             url += "8081/searchmovie?query="+query;
             return new GetTask().execute(url).get();
@@ -29,7 +31,7 @@ public class MovieInformationServer {
     }
 
     // 영화 순위
-    public String hotMovieRank(){
+    public String hotMovieRank(Context context){
         try {
             url += "8081/hotmovierank";
             return new GetTask().execute(url).get();
@@ -43,7 +45,7 @@ public class MovieInformationServer {
     }
 
     // 상세 정보
-    public JSONObject getInfo(String title, String userId){
+    public JSONObject getInfo(Context context, String title, String userId){
         try{
             url += "8081/movieinfo?userId="+userId+"&title="+title;
             data = new GetTask().execute(url).get();
@@ -60,7 +62,7 @@ public class MovieInformationServer {
     }
 
     // 영화 좋아요 상태 변경
-    public String changeLove(String userId, String title, String state){
+    public String changeLove(Context context, String userId, String title, String state){
         try{
             url += "8081/changelove?userId="+userId+"&title="+title+"&state="+state;
             return new GetTask().execute(url).get();
@@ -71,7 +73,7 @@ public class MovieInformationServer {
     }
 
     // 영화 좋아요 목록
-    public String getLoveMovie(String userId){
+    public String getLoveMovie(Context context, String userId){
         try {
             url += "8081/getlovemovie?userId=" + userId;
             return new GetTask().execute(url).get();
@@ -85,7 +87,7 @@ public class MovieInformationServer {
     }
 
     // 시청한 영화 목록
-    public String getWatchMovie(String userId){
+    public String getWatchMovie(Context context, String userId){
         try {
             url += "8081/getwatchmovie?userId=" + userId;
             return new GetTask().execute(url).get();

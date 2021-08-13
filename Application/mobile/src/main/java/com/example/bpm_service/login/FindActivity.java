@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
@@ -23,6 +24,7 @@ public class FindActivity extends AppCompatActivity {
     private Button cancel_button, find_button;
 
     private ProgressDialog progressDialog;
+    private Context context;
 
     //AlertDialog.Builder builder;
 
@@ -37,6 +39,8 @@ public class FindActivity extends AppCompatActivity {
         //상단바 숨기기
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
+
+        context = this;
 
         // 로딩 정의
         progressDialog = new ProgressDialog(this);
@@ -77,7 +81,7 @@ public class FindActivity extends AppCompatActivity {
                     progressDialog.show();
 
                     UserManagementServer userManagementServer = new UserManagementServer(IP);
-                    String result = userManagementServer.find(uname, userEmail, unumber);
+                    String result = userManagementServer.find(context, uname, userEmail, unumber);
 
                     // 찾기 성공
                     if(result.trim().equals("[]")){

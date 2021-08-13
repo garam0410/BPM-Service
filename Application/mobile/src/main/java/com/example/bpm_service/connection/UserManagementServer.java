@@ -1,5 +1,6 @@
 package com.example.bpm_service.connection;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -23,7 +24,7 @@ public class UserManagementServer {
     }
 
     // 로그인
-    public String login(String userId, String userPw){
+    public String login(Context context, String userId, String userPw){
         try {
             url += "8080/login?userId="+userId+"&userPw="+userPw;
             return new GetTask().execute(url).get();
@@ -37,7 +38,7 @@ public class UserManagementServer {
     }
 
     // 회원가입
-    public String register(String uname, String userId, String userPw, String usex, String userEmail, String unumber){
+    public String register(Context context, String uname, String userId, String userPw, String usex, String userEmail, String unumber){
         try {
             url += "8080/register?uname="+uname+"&userId="+userId+"&userPw="+userPw+"&usex="+usex+"&userEmail="+userEmail+"&unumber="+unumber;
             return new GetTask().execute(url).get();
@@ -51,7 +52,7 @@ public class UserManagementServer {
     }
 
     // ID,PW 찾기
-    public String find(String uname, String userEmail, String unumber){
+    public String find(Context context, String uname, String userEmail, String unumber){
         try {
             url += "8080/findidpw?uname="+uname+"&userEmail="+userEmail+"&unumber="+unumber;
             return new GetTask().execute(url).get();

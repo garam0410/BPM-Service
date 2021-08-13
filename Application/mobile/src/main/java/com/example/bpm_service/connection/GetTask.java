@@ -1,8 +1,13 @@
 package com.example.bpm_service.connection;
 
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.example.bpm_service.MainActivity;
+import com.example.bpm_service.home.HomeActivity;
+import com.example.bpm_service.search.SearchActivity;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,6 +20,8 @@ import java.net.URL;
 
 //AsyncTask 연결
 public class GetTask extends AsyncTask<String, Void, String> {
+
+    private ProgressDialog progressDialog;
 
     @Override
     protected String doInBackground(String... strings) {
@@ -54,7 +61,6 @@ public class GetTask extends AsyncTask<String, Void, String> {
         }catch(IOException e){
             e.printStackTrace();
         }
-
         return resultString;
     }
 

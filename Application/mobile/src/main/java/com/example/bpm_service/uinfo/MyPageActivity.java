@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -42,6 +43,7 @@ public class MyPageActivity extends Fragment {
     private MovieListAdapter loveMovieListAdapter;
     private MovieListAdapter watchMovieListAdapter;
 
+    private Context context;
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle saveInstanceState){
         View view = inflater.inflate(R.layout.activity_mypage, container, false);
@@ -49,6 +51,8 @@ public class MyPageActivity extends Fragment {
         IP = getResources().getString(R.string.IP);
 
         SharedPreferences appData = this.getActivity().getSharedPreferences("appData", Activity.MODE_PRIVATE);
+
+        context = getActivity();
 
         logout = (Button) view.findViewById(R.id.logout);
         reservationMovie = (Button) view.findViewById(R.id.reservationMovie);
@@ -97,11 +101,11 @@ public class MyPageActivity extends Fragment {
         });
 
         MovieInformationServer movieInformationServer_1 = new MovieInformationServer(IP);
-        loveList = movieInformationServer_1.getLoveMovie(userId);
+        loveList = movieInformationServer_1.getLoveMovie(context,userId);
         init(loveMovieList, loveMovieListAdapter, loveList);
 
         MovieInformationServer movieInformationServer_2 = new MovieInformationServer(IP);
-        watchList = movieInformationServer_2.getWatchMovie(userId);
+        watchList = movieInformationServer_2.getWatchMovie(context,userId);
         init(watchMovieList, watchMovieListAdapter, watchList);
 
         return view;

@@ -7,6 +7,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -41,8 +43,8 @@ public class MainActivity extends AppCompatActivity{
     //QR 버튼
     private ImageButton qrButton;
 
-    //심박수 측정 버튼
-    private ImageButton heartButton;
+    public static ProgressDialog progressDialog;
+    public static Context context;
 
     // fragment로 지정할 Activity
     private HomeActivity fragment_home;
@@ -60,6 +62,9 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        context = this;
+
         Intent intent = getIntent();
         if(intent != null){
             SAVE_LOGIN_DATA = intent.getBooleanExtra("SAVE_LOGIN_DATA", false);
@@ -92,8 +97,7 @@ public class MainActivity extends AppCompatActivity{
         fragment_home = new HomeActivity();
         fragment_myPage = new MyPageActivity();
         fragment_minfo = new MInfoActivity();
-        //Wearable.getMessageClient(this).addListener(this);
-        //첫화면을 홈으로
+
         setFrag(1);
     }
 
@@ -160,28 +164,4 @@ public class MainActivity extends AppCompatActivity{
                 break;
         }
     }
-//
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        Wearable.getMessageClient(this).addListener(this);
-//    }
-//
-//    @Override
-//    public void onMessageReceived(MessageEvent messageEvent) {
-//        System.out.println("진짜 메시지 받았다");
-//        Intent intent = new Intent(this,ConnectWearableActivity.class);
-//        intent.putExtra("bpmData", new String((messageEvent.getData())));
-//        startActivity(intent);
-//    }
-//
-//    @Override
-//    public void onCapabilityChanged(CapabilityInfo capabilityInfo) {
-//        System.out.println("메시지 받았다");
-//    }
-//
-//    @Override
-//    public void onDataChanged(DataEventBuffer dataEventBuffer) {
-//        System.out.println("메시지 받았다");
-//    }
 }

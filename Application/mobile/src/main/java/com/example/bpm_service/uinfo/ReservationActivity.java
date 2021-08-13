@@ -59,9 +59,6 @@ public class ReservationActivity extends AppCompatActivity {
             movieTime.setText(time);
             Glide.with(this).load(image).into(movieImage);
 
-//            if(reservationState==true){
-//                bpmState.setText();
-//            }
         }
 
         movieImage.setOnClickListener(new View.OnClickListener() {

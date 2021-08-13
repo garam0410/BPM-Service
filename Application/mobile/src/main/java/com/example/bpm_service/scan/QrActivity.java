@@ -3,12 +3,18 @@ package com.example.bpm_service.scan;
 import androidx.annotation.WorkerThread;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -34,6 +40,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -56,12 +63,16 @@ public class QrActivity extends AppCompatActivity {
 
     private static final String START_ACTIVITY_PATH = "/start-activity";
 
+    private Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qr);
 
         IP = getResources().getString(R.string.IP);
+
+        context = this;
 
         buttonScan = (Button) findViewById(R.id.buttonScan);
         bpmStart = (Button) findViewById(R.id.bpmStart);
@@ -90,14 +101,7 @@ public class QrActivity extends AppCompatActivity {
                         .setPositiveButton("예약", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(QrActivity.this, BpmTransactionService.class);
-                                intent.putExtra("bpmStart",true);
-                                intent.putExtra("IP", IP);
-                                intent.putExtra("userId", userId);
-                                intent.putExtra("title", title);
-                                intent.putExtra("time",time);
-                                startService(intent);
-
+                                setAlarm(time);
                                 reservationData = getSharedPreferences("reservationData", MODE_PRIVATE);
                                 SharedPreferences.Editor editor = reservationData.edit();
 
@@ -111,6 +115,7 @@ public class QrActivity extends AppCompatActivity {
                                 editor.putBoolean("reservationState", reservationState);
                                 editor.apply();
 
+                                finish();
                             }
                         }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
                     @Override
@@ -135,6 +140,55 @@ public class QrActivity extends AppCompatActivity {
         qrScan.initiateScan();
     }
 
+    private void setAlarm(String time){
+        Intent intent = new Intent(QrActivity.this, BpmTransactionService.class);
+        intent.putExtra("bpmStart",true);
+        intent.putExtra("IP", IP);
+        intent.putExtra("userId", userId);
+        intent.putExtra("title", title);
+        intent.putExtra("time",time);
+        startService(intent);
+
+        String fullTime = time;
+
+        // Calendar 객체 생성
+        System.out.println("등록");
+        final Calendar calendar = Calendar.getInstance();
+
+        String[] splitTime = time.split("~");
+
+        time = splitTime[0];
+        System.out.println(time);
+
+        splitTime = time.split(":");
+        String hour = splitTime[0];
+        String minute = splitTime[1];
+
+        // 현재 지정된 시간으로 알람 시간 설정
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
+        calendar.set(Calendar.MINUTE, Integer.parseInt(minute));
+        calendar.set(Calendar.SECOND, 0);
+
+        long currentTime = System.currentTimeMillis(); // 현재 시간
+        long triggerTime = calendar.getTimeInMillis(); // 알람을 울릴 시간
+        System.out.println(triggerTime);
+        System.out.println(currentTime);
+        long interval = 1000 * 60 * 60  * 24; // 하루의 시간
+
+        while(currentTime > triggerTime){ // 현재 시간보다 작다면
+            triggerTime += interval; // 다음날 울리도록 처리
+        }
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent timer = new Intent(getApplication(), ConnectWearableActivity.class);
+        timer.putExtra("title",title);
+        timer.putExtra("time", fullTime);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplication(),10,timer,PendingIntent.FLAG_UPDATE_CURRENT);
+
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,triggerTime, pendingIntent);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
@@ -146,6 +200,7 @@ public class QrActivity extends AppCompatActivity {
             } else {
                 //qrcode 결과가 있으면
                 Toast.makeText(QrActivity.this, "스캔완료!", Toast.LENGTH_SHORT).show();
+                System.out.println(result.getContents());
                 try {
                     //data를 json으로 변환
                     JSONObject obj = new JSONObject(result.getContents());
@@ -171,7 +226,7 @@ public class QrActivity extends AppCompatActivity {
     public void getImage(String title){
         // 데이터 불러오기
         MovieInformationServer movieInformationServer = new MovieInformationServer(IP);
-        data = movieInformationServer.search(title);
+        data = movieInformationServer.search(context,title);
 
         // 이미지 적용
         try {

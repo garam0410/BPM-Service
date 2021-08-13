@@ -13,6 +13,7 @@ import androidx.annotation.WorkerThread;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.bpm_service.R;
+import com.example.bpm_service.scan.QrActivity;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApi;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -33,6 +34,9 @@ import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -41,22 +45,25 @@ import java.util.concurrent.ExecutionException;
 public class ConnectWearableActivity extends AppCompatActivity{
 
     private static Context context;
-    private TextView mTextView;
 
-    public static final String WEARABLE_DATA_PATH= "/mypath";
     private static final String START_ACTIVITY_PATH = "/start-activity";
+
+    private String title, time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect_wearable);
         context = this;
-//
-//        mTextView = (TextView) findViewById(R.id.textView5);
-//        Intent intent =getIntent();
-//        if(intent!=null){
-//            mTextView.setText(intent.getStringExtra("bpmData"));
-//        }
+
+        Intent intent = getIntent();
+        if(intent != null){
+            title = intent.getExtras().getString("title");
+            time = intent.getExtras().getString("time");
+        }
+
+        onStartWearableActivityClick();
+        finish();
     }
 
     public void onStartWearableActivityClick() {
@@ -102,13 +109,18 @@ public class ConnectWearableActivity extends AppCompatActivity{
     }
 
     @WorkerThread
-    private void sendStartActivityMessage(String node) {
-
-        Task<Integer> sendMessageTask =
-                Wearable.getMessageClient(this).sendMessage(node, START_ACTIVITY_PATH, "startMonitoring".getBytes());
+    private void sendStartActivityMessage(String node){
 
         try {
+            JSONObject json = new JSONObject();
+            json.put("title", title);
+            json.put("time", time);
+            json.put("message", "startMonitoring");
+
+            Task<Integer> sendMessageTask =
+                    Wearable.getMessageClient(this).sendMessage(node, START_ACTIVITY_PATH, json.toString().getBytes());
             Integer result = Tasks.await(sendMessageTask);
+
             System.out.println("message sent : " + result);
 
         } catch (ExecutionException exception) {
@@ -116,6 +128,8 @@ public class ConnectWearableActivity extends AppCompatActivity{
 
         } catch (InterruptedException exception) {
             System.out.println("interrupt occrurred : " + exception);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 

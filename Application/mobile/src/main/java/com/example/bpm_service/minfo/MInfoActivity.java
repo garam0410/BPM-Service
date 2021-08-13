@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Movie;
@@ -62,6 +63,7 @@ public class MInfoActivity extends AppCompatActivity{
 
     private EditText reviewBar;
     private Button insertReview;
+    private Context context;
 
     private TabLayout.Tab changeIndex;
 
@@ -72,6 +74,8 @@ public class MInfoActivity extends AppCompatActivity{
 
         IP = getResources().getString(R.string.IP);
         //IP = "http://61.245.226.112:";
+
+        context = this;
 
         // 상단바 제거
         ActionBar actionBar = getSupportActionBar();
@@ -200,11 +204,11 @@ public class MInfoActivity extends AppCompatActivity{
                 if(loveButton.getText().toString().equals("❤")){
                     MovieInformationServer changeState = new MovieInformationServer(IP);
                     loveButton.setText("🤍");
-                    Toast.makeText(MInfoActivity.this, changeState.changeLove(userId, titleText.getText().toString(),"delete"), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MInfoActivity.this, changeState.changeLove(context, userId, titleText.getText().toString(),"delete"), Toast.LENGTH_SHORT).show();
                 }else{
                     MovieInformationServer changeState = new MovieInformationServer(IP);
                     loveButton.setText("❤");
-                    Toast.makeText(MInfoActivity.this, changeState.changeLove(userId, titleText.getText().toString(),"insert"), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MInfoActivity.this, changeState.changeLove(context, userId, titleText.getText().toString(),"insert"), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -217,7 +221,7 @@ public class MInfoActivity extends AppCompatActivity{
             hotData = intent.getStringExtra("hotData");
             if(hotData==null){
                 MovieInformationServer movieInformationServer = new MovieInformationServer(IP);
-                hotData = movieInformationServer.hotMovieRank();
+                hotData = movieInformationServer.hotMovieRank(context);
             }
         }
 
@@ -254,7 +258,7 @@ public class MInfoActivity extends AppCompatActivity{
 
         try{
             SocialServer socialServer = new SocialServer(IP);
-            commentData = socialServer.selectCommentList(title);
+            commentData = socialServer.selectCommentList(context, title);
 
             for(int i = 0; i<commentData.length(); i++){
                 JSONObject json = (JSONObject) commentData.get(i);
@@ -315,7 +319,7 @@ public class MInfoActivity extends AppCompatActivity{
     // 영화 데이터 적용 함수
     public void setData(String getTitle){
         MovieInformationServer movieInformationServer = new MovieInformationServer(IP);
-        JSONObject data = movieInformationServer.getInfo(getTitle, userId);
+        JSONObject data = movieInformationServer.getInfo(context, getTitle, userId);
 
         try {
             title = getTitle;
@@ -336,8 +340,9 @@ public class MInfoActivity extends AppCompatActivity{
             }
 
             Glide.with(this).load(data.get("image").toString()).into(poster);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            setData(getTitle);
         }
     }
 
@@ -405,7 +410,7 @@ public class MInfoActivity extends AppCompatActivity{
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 SocialServer socialServer = new SocialServer(IP);
-                socialServer.deleteComment(cid);
+                socialServer.deleteComment(context, cid);
                 initCommentData(title);
             }
         });

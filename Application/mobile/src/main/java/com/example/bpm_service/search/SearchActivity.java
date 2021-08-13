@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -47,6 +48,8 @@ public class SearchActivity extends Fragment {
     private String data;
     private String userId;
 
+    private Context context;
+
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle saveInstanceState){
         View view = inflater.inflate(R.layout.activity_search, container, false);
 
@@ -54,12 +57,7 @@ public class SearchActivity extends Fragment {
 
         userId = getArguments().getString("userId");
 
-        // 상단바 제거
-//        ActionBar actionBar = ((MainActivity)getActivity()).getSupportActionBar();
-//        actionBar.hide();
-
-        // 로딩 정의
-        progressDialog = new ProgressDialog(getActivity());
+        context = getActivity();
 
         // 컴포넌트 연결
         searchList = (ListView) view.findViewById(R.id.searchlist);
@@ -121,9 +119,6 @@ public class SearchActivity extends Fragment {
     }
 
     public void search(){
-        progressDialog.setMessage("검색중...");
-        progressDialog.show();
-
         String query = search_bar.getText().toString();
 
         // 공백 검사
@@ -137,7 +132,7 @@ public class SearchActivity extends Fragment {
 
             // 데이터 불러오기
             MovieInformationServer movieInformationServer = new MovieInformationServer(IP);
-            data = movieInformationServer.search(query);
+            data = movieInformationServer.search(context, query);
 
             // 리스트 추가
             try {
@@ -158,7 +153,5 @@ public class SearchActivity extends Fragment {
                 e.printStackTrace();
             }
         }
-
-        progressDialog.cancel();
     }
 }

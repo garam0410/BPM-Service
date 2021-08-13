@@ -15,15 +15,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
-        <service
-            android:name=".heartrate.ReservationService"
-            android:enabled="true"
-            android:exported="true"></service>
-
         <receiver
-            android:name=".heartrate.ReservationReceiver"
+            android:name=".heartrate.AlarmReceiver"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"></receiver>
 
         <activity android:name=".uinfo.ReservationActivity" />
 

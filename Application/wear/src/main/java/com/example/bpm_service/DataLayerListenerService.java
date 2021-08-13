@@ -28,6 +28,10 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class DataLayerListenerService extends WearableListenerService {
 
     private static final String TAG = "DataLayerService";
@@ -73,11 +77,26 @@ public class DataLayerListenerService extends WearableListenerService {
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         Log.d(TAG, "onMessageReceived: " + messageEvent.getData());
-        final String message = new String((messageEvent.getData()));
+        //final String message = new String((messageEvent.getData()));
+        String message = "";
+        String title = "", time = "";
+
+        try {
+            JSONObject json = new JSONObject(new String((messageEvent.getData())));
+            message = json.getString("message");
+            title = json.getString("title");
+            time = json.getString("time");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         // Check to see if the message is to start an activity
         if (messageEvent.getPath().equals(START_ACTIVITY_PATH)) {
             Intent startIntent = new Intent(this, MainActivity.class);
             startIntent.putExtra("message", message);
+            startIntent.putExtra("title", title);
+            startIntent.putExtra("time", time);
             startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(startIntent);
         }

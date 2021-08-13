@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FDCFC0EC"
+    android:background="#000000"
     android:padding="@dimen/box_inset_layout_padding"
     tools:context="com.example.bpm_service.MainActivity"
     tools:deviceIds="wear">
@@ -18,23 +18,22 @@
         app:boxedEdges="all">
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/movieTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_margin="10dp"
             android:text="movie name"
-            android:textColor="#000000" />
+            android:textColor="#ffffff" />
 
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
+        <TextClock
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Current time"
-            android:layout_gravity="center_horizontal"/>
+            android:format12Hour="hh:mm:ss"
+            android:layout_gravity="center"/>
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/movieTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="End Time"

@@ -42,7 +42,8 @@ public class MainActivity extends AppCompatActivity{
 
     //QR 버튼
     private ImageButton qrButton;
-
+    
+    // ProgressDialog
     public static ProgressDialog progressDialog;
     public static Context context;
 
@@ -140,21 +141,21 @@ public class MainActivity extends AppCompatActivity{
         fragmentManager = getSupportFragmentManager();
         transaction = fragmentManager.beginTransaction();
         switch(n){
-            case 0 :
+            case 0 : // SearchActivity
                 Bundle bundle_1 = new Bundle();
                 bundle_1.putString("userId", userId);
                 fragment_search.setArguments(bundle_1);
                 transaction.replace(R.id.mainFrame, fragment_search);
                 transaction.commit();
                 break;
-            case 1 :
+            case 1 : // HomeActivity
                 Bundle bundle_2 = new Bundle();
                 bundle_2.putString("userId",userId);
                 fragment_home.setArguments(bundle_2);
                 transaction.replace(R.id.mainFrame, fragment_home);
                 transaction.commit();
                 break;
-            case 2 :
+            case 2 : // MyPageActivity
                 Bundle bundle_3 = new Bundle();
                 bundle_3.putBoolean("SAVE_LOGIN_DATA", SAVE_LOGIN_DATA);
                 bundle_3.putString("userId", userId);

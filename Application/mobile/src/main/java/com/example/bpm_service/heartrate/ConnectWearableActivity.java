@@ -42,36 +42,42 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+// 지정된 시간에 스마트워치의 심박수 측정 시작 신호를 보내는 액티비티
 public class ConnectWearableActivity extends AppCompatActivity{
 
-    private static Context context;
-
+    // 스마트워치에서 액티비티 시작을 알리는 Path
     private static final String START_ACTIVITY_PATH = "/start-activity";
 
+    // 영화 제목 및 시간
     private String title, time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect_wearable);
-        context = this;
 
+        // 스마트워치로 보낼 데이터를 받아오기
         Intent intent = getIntent();
         if(intent != null){
             title = intent.getExtras().getString("title");
             time = intent.getExtras().getString("time");
         }
 
+        // 워치 액티비티 시작
         onStartWearableActivityClick();
+
+        // 시작 신호 보내고 현재 액티비티는 종료
         finish();
     }
 
+    // 액티비티 시작 신호 전송
     public void onStartWearableActivityClick() {
         System.out.println("wearable Start");
 
         new StartWearableActivityTask().execute();
     }
 
+    // 스마트워치 기기를 찾고 데이터를 전송하는 클래스
     private class StartWearableActivityTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -84,6 +90,7 @@ public class ConnectWearableActivity extends AppCompatActivity{
         }
     }
 
+    // 기기 찾기
     @WorkerThread
     private Collection<String> getNodes() {
         HashSet<String> results = new HashSet<>();
@@ -117,6 +124,7 @@ public class ConnectWearableActivity extends AppCompatActivity{
             json.put("time", time);
             json.put("message", "startMonitoring");
 
+            // 스마트 워치로 시작신호 전송 Task
             Task<Integer> sendMessageTask =
                     Wearable.getMessageClient(this).sendMessage(node, START_ACTIVITY_PATH, json.toString().getBytes());
             Integer result = Tasks.await(sendMessageTask);

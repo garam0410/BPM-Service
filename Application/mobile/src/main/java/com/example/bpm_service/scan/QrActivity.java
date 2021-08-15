@@ -61,8 +61,6 @@ public class QrActivity extends AppCompatActivity {
     private SharedPreferences reservationData;
     private boolean reservationState;
 
-    private static final String START_ACTIVITY_PATH = "/start-activity";
-
     private Context context;
 
     @Override
@@ -101,7 +99,7 @@ public class QrActivity extends AppCompatActivity {
                         .setPositiveButton("예약", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                setAlarm(time);
+                                setReservation(time);
                                 reservationData = getSharedPreferences("reservationData", MODE_PRIVATE);
                                 SharedPreferences.Editor editor = reservationData.edit();
 
@@ -140,7 +138,10 @@ public class QrActivity extends AppCompatActivity {
         qrScan.initiateScan();
     }
 
-    private void setAlarm(String time){
+    // 예약 설정 함수
+    private void setReservation(String time){
+
+        // 설정된 시간에 측정을 시작하기 위한 백그라운드 서비스 시작
         Intent intent = new Intent(QrActivity.this, BpmTransactionService.class);
         intent.putExtra("bpmStart",true);
         intent.putExtra("IP", IP);
@@ -223,6 +224,7 @@ public class QrActivity extends AppCompatActivity {
         }
     }
 
+    // qr 인식을 통해 얻은 영화의 썸네일 이미지 불러오기
     public void getImage(String title){
         // 데이터 불러오기
         MovieInformationServer movieInformationServer = new MovieInformationServer(IP);
@@ -242,65 +244,65 @@ public class QrActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
-    public void onStartWearableActivityClick(View view) {
-        System.out.println("wearable Start");
-
-        new QrActivity.StartWearableActivityTask().execute();
-    }
-
-    private class StartWearableActivityTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... args) {
-            Collection<String> nodes = getNodes();
-            for (String node : nodes) {
-                sendStartActivityMessage(node);
-            }
-            return null;
-        }
-    }
-
-    @WorkerThread
-    private Collection<String> getNodes() {
-        HashSet<String> results = new HashSet<>();
-
-        Task<List<Node>> nodeListTask =
-                Wearable.getNodeClient(getApplicationContext()).getConnectedNodes();
-
-        try {
-            List<Node> nodes = Tasks.await(nodeListTask);
-
-            for (Node node : nodes) {
-                results.add(node.getId());
-            }
-
-        } catch (ExecutionException exception) {
-            System.out.println("Task failed : " + exception);
-
-        } catch (InterruptedException exception) {
-            System.out.println("Interrupt occurred : " + exception);
-        }
-
-        return results;
-    }
-
-    @WorkerThread
-    private void sendStartActivityMessage(String node) {
-
-        Task<Integer> sendMessageTask =
-                Wearable.getMessageClient(this).sendMessage(node, START_ACTIVITY_PATH, "startMonitoring".getBytes());
-
-        try {
-            Integer result = Tasks.await(sendMessageTask);
-            System.out.println("message sent : " + result);
-
-        } catch (ExecutionException exception) {
-            System.out.println("task failed : " + exception);
-
-        } catch (InterruptedException exception) {
-            System.out.println("interrupt occrurred : " + exception);
-        }
-    }
+//
+//    public void onStartWearableActivityClick(View view) {
+//        System.out.println("wearable Start");
+//
+//        new QrActivity.StartWearableActivityTask().execute();
+//    }
+//
+//    private class StartWearableActivityTask extends AsyncTask<Void, Void, Void> {
+//
+//        @Override
+//        protected Void doInBackground(Void... args) {
+//            Collection<String> nodes = getNodes();
+//            for (String node : nodes) {
+//                sendStartActivityMessage(node);
+//            }
+//            return null;
+//        }
+//    }
+//
+//    @WorkerThread
+//    private Collection<String> getNodes() {
+//        HashSet<String> results = new HashSet<>();
+//
+//        Task<List<Node>> nodeListTask =
+//                Wearable.getNodeClient(getApplicationContext()).getConnectedNodes();
+//
+//        try {
+//            List<Node> nodes = Tasks.await(nodeListTask);
+//
+//            for (Node node : nodes) {
+//                results.add(node.getId());
+//            }
+//
+//        } catch (ExecutionException exception) {
+//            System.out.println("Task failed : " + exception);
+//
+//        } catch (InterruptedException exception) {
+//            System.out.println("Interrupt occurred : " + exception);
+//        }
+//
+//        return results;
+//    }
+//
+//    @WorkerThread
+//    private void sendStartActivityMessage(String node) {
+//
+//        Task<Integer> sendMessageTask =
+//                Wearable.getMessageClient(this).sendMessage(node, START_ACTIVITY_PATH, "startMonitoring".getBytes());
+//
+//        try {
+//            Integer result = Tasks.await(sendMessageTask);
+//            System.out.println("message sent : " + result);
+//
+//        } catch (ExecutionException exception) {
+//            System.out.println("task failed : " + exception);
+//
+//        } catch (InterruptedException exception) {
+//            System.out.println("interrupt occrurred : " + exception);
+//        }
+//    }
 
 }

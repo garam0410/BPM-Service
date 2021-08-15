@@ -1,5 +1,6 @@
 package com.example.bpm_service.dto;
 
+// 영화 DTO
 public class MovieDto {
 
     private String title;

@@ -101,6 +101,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             setAmbientEnabled();
             permissionRequest();
 
+            // 모바일에서 받은 데이터에 startMonitoring 이 확인되면, 측정 시작
             if (message.equals("startMonitoring")) {
                 movieTitle.setText(title);
                 movieTime.setText(time);
@@ -120,6 +121,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         }
     }
 
+    // 측정 시작
     private void startSensor() {
         list = new ArrayList<>();
         mSensorManager = ((SensorManager) getSystemService(SENSOR_SERVICE));
@@ -129,12 +131,14 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         mSensorManager.registerListener(this, mHeartRateSensor,SensorManager.SENSOR_DELAY_FASTEST);
     }
 
+    // 측정 중단
     private void stopOnClick() {
         mSensorManager.unregisterListener(this);
         bpmData = bpmData.substring(0, bpmData.length()-1);
         mTextView.setText(bpmData);
     }
 
+    // 센서값 저장
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_HEART_RATE){
@@ -143,7 +147,9 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             bpmData += (int)event.values[0] + ",";
             System.out.println(event.values[0]);  //이거 값을 전달해야
 
-        long currentTime = System.currentTimeMillis();  //현재 시간
+            // 현재시간과 끝나는 시간 비교해서 심박수 더 측정할 건지 유무 결정
+
+            long currentTime = System.currentTimeMillis();  //현재 시간
 
             if(currentTime>=triggerTime){
                 onStartMobileActivityClick();
@@ -156,6 +162,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     }
 
+    // 권한 요청
     public void permissionRequest(){
 
         if (checkSelfPermission(Manifest.permission.BODY_SENSORS)
@@ -167,6 +174,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         }
     }
 
+    // 모바일로 데이터 전송
     public void onStartMobileActivityClick() {
         System.out.println("mobile Start");
         stopOnClick();
@@ -174,6 +182,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         new StartWearableActivityTask().execute();
     }
 
+    // 모바일로 데이터 전송하는 클래스
     private class StartWearableActivityTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -188,6 +197,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         }
     }
 
+    //기기 목록 가져오기
     @WorkerThread
     private Collection<String> getNodes() {
         HashSet<String> results = new HashSet<>();
@@ -213,12 +223,14 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         return results;
     }
 
+    // 모바일로 데이터 전송 시작
     @WorkerThread
     private void sendStartActivityMessage(String node) {
 
         Task<Integer> sendMessageTask =
                 Wearable.getMessageClient(this).sendMessage(node, START_ACTIVITY_PATH, bpmData.getBytes());
 
+        // 전송 유무 체크
         sendMessageTask.addOnSuccessListener(new OnSuccessListener<Integer>() {
             @Override
             public void onSuccess(Integer integer) {

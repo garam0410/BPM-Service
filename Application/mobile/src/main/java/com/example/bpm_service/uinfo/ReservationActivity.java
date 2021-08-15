@@ -45,6 +45,7 @@ public class ReservationActivity extends AppCompatActivity {
 
         movieImage = (ImageButton) findViewById(R.id.movieImage);
 
+        // 예약된 영화 정보 가져오기
         reservationData = this.getSharedPreferences("reservationData", Activity.MODE_PRIVATE);
         if(reservationData != null){
             userId = reservationData.getString("userId","");
@@ -71,6 +72,7 @@ public class ReservationActivity extends AppCompatActivity {
             }
         });
 
+        // 예약 취소 버튼
         bpmState.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

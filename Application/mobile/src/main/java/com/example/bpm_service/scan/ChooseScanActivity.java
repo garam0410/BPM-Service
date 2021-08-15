@@ -40,21 +40,13 @@ import java.util.Date;
 
 public class ChooseScanActivity extends AppCompatActivity {
 
-    private static final int REQUEST_IMAGE_CAPTURE = 672;
     private final int GET_GALLERY_IMAGE = 200;
 
     private String imageFilePath;
-    private Uri photoUri;
-
     private ImageButton newButton,loadButton;
-
-    private ProgressDialog progressDialog;
-    private IntentIntegrator qrScan;
 
     Bitmap image;
 
-    String ocrApiGwUrl;
-    String ocrSecretKey;
 
     private String userId = "";
     @Override
@@ -83,6 +75,7 @@ public class ChooseScanActivity extends AppCompatActivity {
             }
         });
 
+        // QR 사진 불러오기 버튼
         loadButton = (ImageButton) findViewById(R.id.loadPicture);
         loadButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,11 +84,12 @@ public class ChooseScanActivity extends AppCompatActivity {
 //                Intent intent = new Intent(Intent.ACTION_PICK);
 //                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
 //                startActivityForResult(intent, GET_GALLERY_IMAGE);
-                Toast.makeText(getApplicationContext(),"읽어올래!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"준비중입니다!",Toast.LENGTH_LONG).show();
             }
         });
     }
 
+    // 카메라 및 앨범 권한 체크
     public void PermissionCheck() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED &&

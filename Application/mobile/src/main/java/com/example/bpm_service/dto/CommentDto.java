@@ -1,5 +1,6 @@
 package com.example.bpm_service.dto;
 
+// 댓글 DTO
 public class CommentDto{
     private Long cid;
     private Long mid;

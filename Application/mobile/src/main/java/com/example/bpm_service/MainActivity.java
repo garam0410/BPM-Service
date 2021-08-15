@@ -123,6 +123,7 @@ public class MainActivity extends AppCompatActivity{
         Toolbar parent = (Toolbar)actionbar.getParent();
         parent.setContentInsetsAbsolute(0,0);
 
+        // 상단 QR 버튼 눌렀을 때
         qrButton = (ImageButton) findViewById(R.id.qrButton);
         qrButton.setOnClickListener(new View.OnClickListener() {
             @Override

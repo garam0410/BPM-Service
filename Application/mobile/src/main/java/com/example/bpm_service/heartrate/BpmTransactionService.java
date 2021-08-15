@@ -31,6 +31,7 @@ import org.json.JSONObject;
 
 import java.util.Calendar;
 
+// 심박수 처리 서비스
 public class BpmTransactionService extends Service implements
         DataClient.OnDataChangedListener,
         MessageClient.OnMessageReceivedListener,
@@ -39,10 +40,10 @@ public class BpmTransactionService extends Service implements
     public BpmTransactionService() {
     }
 
-    String IP = "";
-    String userId = "";
-    String title = "";
-    String time = "";
+    String IP = ""; // 서버 IP
+    String userId = ""; // 사용자 ID
+    String title = ""; // 영화 제목
+    String time = ""; // 영화 running time
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -50,24 +51,26 @@ public class BpmTransactionService extends Service implements
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
+    // 서비스 시작 요청시,
     @Override
     public int onStartCommand(Intent intent, int flag, int startId){
+
+        // 데이터 가져오기
         boolean state = intent.getExtras().getBoolean("bpmStart");
         IP = intent.getExtras().getString("IP","");
         userId = intent.getExtras().getString("userId","");
         title = intent.getExtras().getString("title","");
         time = intent.getExtras().getString("time","");
 
-        if(state){
+        if(state){ // 백그라운드 작업 시작
             System.out.println("측정예약을 위해 백그라운드 작업 진입");
             Wearable.getMessageClient(this).addListener(this);
             return START_NOT_STICKY;
-        }else{
+        }else{// 백그라운드 작업 종료
             System.out.println("측정 종료 혹은 취소로 인한 백그라운드 작업 취소");
         }
 
         return super.onStartCommand(intent, flag, startId);
-//        return START_NOT_STICKY;
     }
 
     @Override
@@ -80,11 +83,14 @@ public class BpmTransactionService extends Service implements
 
     }
 
+    // 스마트워치로부터 심박수 데이터를 받았을 때
     @Override
     public void onMessageReceived(@NonNull @NotNull MessageEvent messageEvent) {
 
+        // 심박수 데이터 전속을 위한 Server 객체 생성
         SocialServer socialServer = new SocialServer(IP);
         try{
+            // JSON에 데이터 담기
             JSONObject json = new JSONObject();
             json.put("title", title);
             json.put("userId", userId);
@@ -92,12 +98,15 @@ public class BpmTransactionService extends Service implements
 
             System.out.println(json.toString());
 
+            // 데이터 전송
             socialServer.sendBpm(json.toString());
 
+            // 백그라운드 작업 종료를 위한 서비스 실행
             Intent intent = new Intent(this,BpmTransactionService.class);
             intent.putExtra("bpmStart", false);
             startService(intent);
 
+            // 예약 된 영화 초기화
             SharedPreferences reservationData = getSharedPreferences("reservationData", MODE_PRIVATE);
             SharedPreferences.Editor editor = reservationData.edit();
             editor.clear();

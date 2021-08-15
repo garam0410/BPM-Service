@@ -100,10 +100,12 @@ public class MyPageActivity extends Fragment {
             }
         });
 
+        // 좋아요 누른 영화 리스트
         MovieInformationServer movieInformationServer_1 = new MovieInformationServer(IP);
         loveList = movieInformationServer_1.getLoveMovie(context,userId);
         init(loveMovieList, loveMovieListAdapter, loveList);
 
+        // 측정한 영화 리스트
         MovieInformationServer movieInformationServer_2 = new MovieInformationServer(IP);
         watchList = movieInformationServer_2.getWatchMovie(context,userId);
         init(watchMovieList, watchMovieListAdapter, watchList);
@@ -111,6 +113,7 @@ public class MyPageActivity extends Fragment {
         return view;
     }
 
+    // 리스트 업데이트
     private void init(RecyclerView recyclerView, MovieListAdapter movieListAdapter, String data) {
 
         ArrayList<String> titleList = new ArrayList<>();

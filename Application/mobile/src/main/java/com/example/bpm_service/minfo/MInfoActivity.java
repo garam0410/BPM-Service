@@ -85,6 +85,7 @@ public class MInfoActivity extends AppCompatActivity{
         movieRankList = findViewById(R.id.hotMovieRank);
         commentList = findViewById(R.id.commentList);
 
+        // 영화 상세정보를 표시할 컴포넌트 연결
         titleText = (TextView) findViewById(R.id.titleText);
         openText = (TextView) findViewById(R.id.openText);
         genreText = (TextView) findViewById(R.id.genreText);
@@ -95,7 +96,6 @@ public class MInfoActivity extends AppCompatActivity{
         bpmText = (TextView) findViewById(R.id.bpmText);
         loveButton = (TextView) findViewById(R.id.loveButton);
         summaryText = (TextView) findViewById(R.id.summaryText);
-
         poster = (ImageView) findViewById(R.id.poster);
         reviewBar = (EditText) findViewById(R.id.reviewBar);
 
@@ -278,7 +278,7 @@ public class MInfoActivity extends AppCompatActivity{
         }
     }
 
-    // 리스트 초기화 함수
+    // 리스트 초기화 함수 ( 상단 영화 순위 리스트)
     private void initHotdata(RecyclerView recyclerView, MovieListAdapter movieListAdapter, String data) {
 
         ArrayList<String> titleList = new ArrayList<>();
@@ -286,6 +286,8 @@ public class MInfoActivity extends AppCompatActivity{
 
         try{
             JSONArray json = new JSONArray(data);
+
+            //Json 파싱
             for(int i = 0; i<json.length(); i++){
                 JSONObject obj = (JSONObject)json.get(i);
 
@@ -318,6 +320,7 @@ public class MInfoActivity extends AppCompatActivity{
 
     // 영화 데이터 적용 함수
     public void setData(String getTitle){
+        // 서버로부터 영화 데이터 가져오기
         MovieInformationServer movieInformationServer = new MovieInformationServer(IP);
         JSONObject data = movieInformationServer.getInfo(context, getTitle, userId);
 
@@ -342,23 +345,24 @@ public class MInfoActivity extends AppCompatActivity{
             Glide.with(this).load(data.get("image").toString()).into(poster);
         } catch (Exception e) {
             e.printStackTrace();
+            // 데이터를 한번에 받아오지 못했을 때, 재시도
             setData(getTitle);
         }
     }
 
+    // 상단 영화를 클릭 했을때, 영화 정보 다시 가져오기 및 댓글 가져오기
     private View.OnClickListener onClickItem = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             setData((String)v.getTag());
             initCommentData((String)v.getTag());
-//            detailPage.setVisibility(View.VISIBLE) ;
-//            reviewPage.setVisibility(View.INVISIBLE) ;
-//            tabLayout.selectTab(changeIndex);
         }
     };
 
-    // 수정 dialog
+    // 댓글 수정 dialog
     public void modifyAlertHandler(String alertTitle, String message, String cid, String comment){
+
+        //수정 창 디자인
         EditText editText = new EditText(getApplicationContext());
         FrameLayout container = new FrameLayout(MInfoActivity.this);
         FrameLayout.LayoutParams params = new  FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -371,12 +375,16 @@ public class MInfoActivity extends AppCompatActivity{
         builder.setTitle(alertTitle).setMessage(message);
         builder.setView(container);
         editText.setText(comment);
+
         builder.setPositiveButton("수정", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(editText.getText().toString().equals(comment)){
+
+                if(editText.getText().toString().equals(comment)){ // 수정한 내용이 지금 내용이랑 같다면, 댓글 새로고침
                     initCommentData(title);
-                }else{
+                }
+                // 아니라면 댓글 업데이트 이후에 새로고침
+                else{
                     SocialServer socialServer = new SocialServer(IP);
                     try {
                         JSONObject json = new JSONObject();

@@ -25,6 +25,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
     private ArrayList<String> titleList;
     private ArrayList<String> imageList;
 
+    // 생성자
     public MovieListAdapter(Context context, ArrayList<String> itemList, ArrayList<String> titleList, ArrayList<String> imageList , View.OnClickListener onClickItem) {
         this.context = context;
         this.itemList = itemList;
@@ -47,6 +48,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
+        // 이미지, 순위, 영화 제목 설정
         String item = itemList.get(position);
         String title = titleList.get(position);
         String image = imageList.get(position);

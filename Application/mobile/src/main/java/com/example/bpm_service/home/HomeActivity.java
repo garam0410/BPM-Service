@@ -30,30 +30,36 @@ public class HomeActivity extends Fragment {
 
     public static Context context;
     private RecyclerView movieRankList, userRankList;
+
+    // 심박수 분석 영화 순위 어댑터
     public MovieListAdapter movieListAdapter_rank;
+
+    // 협업필터링 이용 영화 순위 어댑터
     public MovieListAdapter movieListAdapter_user;
 
-    public String hotData;
+    public String hotData, userData;
     public String userId="";
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle saveInstanceState){
         View view = inflater.inflate(R.layout.activity_home, container, false);
 
+        // 서버 주소 연결
         String IP = getResources().getString(R.string.IP);
-        //String IP = "http://61.245.226.112:";
 
         context = getActivity();
 
         movieRankList = view.findViewById(R.id.hotMovieRank);
         userRankList = view.findViewById(R.id.userMovieRank);
 
+        //MainActivity에서 Bundle로 받아온 변수 저장
         Bundle bundle = getArguments();
         userId = bundle.getString("userId");
 
-        MovieInformationServer movieInformationServer = new MovieInformationServer(IP);
+        MovieInformationServer bpmRanking = new MovieInformationServer(IP);
+        MovieInformationServer userRanking = new MovieInformationServer(IP);
 
-        hotData = movieInformationServer.hotMovieRank(context);
-        //String userData = movieInformationServer.userMovieRank();
+        hotData = bpmRanking.hotMovieRank(context);
+        //userData = userRanking.userMovieRank(context);
 
         init(movieRankList,movieListAdapter_rank, hotData);
         init(userRankList,movieListAdapter_user, hotData);
@@ -61,13 +67,17 @@ public class HomeActivity extends Fragment {
         return view;
     }
 
+    // RecyclerView 생성 함수
     private void init(RecyclerView recyclerView, MovieListAdapter movieListAdapter, String data) {
 
+        // 영화 제목과 이미지 url을 담을 ArrayList
         ArrayList<String> titleList = new ArrayList<>();
         ArrayList<String> imageList = new ArrayList<>();
 
         try{
             JSONArray json = new JSONArray(data);
+
+            // Json 파싱
             for(int i = 0; i<json.length(); i++){
                 JSONObject obj = (JSONObject)json.get(i);
 
@@ -84,6 +94,7 @@ public class HomeActivity extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(layoutManager);
 
+        // 1위부터 5위까지
         ArrayList<String> itemList = new ArrayList<>();
         itemList.add("1");
         itemList.add("2");
@@ -91,6 +102,7 @@ public class HomeActivity extends Fragment {
         itemList.add("4");
         itemList.add("5");
 
+        // Adapter에 연결
         movieListAdapter = new MovieListAdapter(getActivity(), itemList, titleList,imageList, onClickItem);
         recyclerView.setAdapter(movieListAdapter);
 
@@ -99,6 +111,7 @@ public class HomeActivity extends Fragment {
     }
 
 
+    // 영화 클릭시 이벤트 발생, 영화 상세정보 페이지 띄워줌
     private View.OnClickListener onClickItem = new View.OnClickListener() {
         @Override
         public void onClick(View v) {

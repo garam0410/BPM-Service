@@ -12,6 +12,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+//AsyncTask 연결
 public class PostTask extends AsyncTask<String, Void, String> {
 
     @Override

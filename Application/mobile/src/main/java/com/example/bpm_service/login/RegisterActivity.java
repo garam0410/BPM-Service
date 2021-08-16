@@ -22,7 +22,7 @@ import com.example.bpm_service.connection.UserManagementServer;
 public class RegisterActivity extends AppCompatActivity {
 
     // 컴포넌트 정의
-    private EditText editName, editId, editPw, editPwCheck, editEmail, editNumber;
+    private EditText editName, editId, editPw, editPwCheck, editEmail, editNumber, editAge;
     private Spinner editSex;
     private Button cancel_button, register_button;
 
@@ -30,7 +30,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Context context;
 
     // 입력값을 저장할 변수
-    private String uname, userId, userPw, userPwCheck, usex, userEmail, unumber;
+    private String uname, userId, userPw, userPwCheck, uAge, usex, userEmail, unumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +54,7 @@ public class RegisterActivity extends AppCompatActivity {
         editId = (EditText) findViewById(R.id.editId);
         editPw = (EditText) findViewById(R.id.editPw);
         editPwCheck = (EditText) findViewById(R.id.editPwCheck);
+        editAge = (EditText) findViewById(R.id.editAge);
         editEmail = (EditText) findViewById(R.id.editEmail);
         editNumber = (EditText) findViewById(R.id.editNumber);
 
@@ -86,6 +87,7 @@ public class RegisterActivity extends AppCompatActivity {
                 userId = editId.getText().toString();
                 userPw = editPw.getText().toString();
                 userPwCheck = editPwCheck.getText().toString();
+                uAge = editAge.getText().toString();
                 usex = editSex.getSelectedItem().toString();
                 userEmail = editEmail.getText().toString();
                 unumber = editNumber.getText().toString();
@@ -98,7 +100,7 @@ public class RegisterActivity extends AppCompatActivity {
                 }
 
                 // 빈칸이 있을 때,
-                if(uname.equals("") || userId.equals("") || userPw.equals("") || userPwCheck.equals("") || userEmail.equals("") || unumber.equals("")){
+                if(uname.equals("") || userId.equals("") || userPw.equals("") || userPwCheck.equals("") || uAge.equals("") || userEmail.equals("") || unumber.equals("")){
                     Toast.makeText(RegisterActivity.this, "모두 기입해주세요!", Toast.LENGTH_SHORT).show();
                 }
 
@@ -111,7 +113,7 @@ public class RegisterActivity extends AppCompatActivity {
                     progressDialog.show();
 
                     UserManagementServer userManagementServer = new UserManagementServer(IP);
-                    String result = userManagementServer.register(context, uname, userId, userPw, usex, userEmail,unumber);
+                    String result = userManagementServer.register(context, uname, userId, userPw, uAge, usex, userEmail,unumber);
 
                     // 회원가입 성공
                     if(result.trim().equals("Success")){

@@ -38,9 +38,9 @@ public class UserManagementServer {
     }
 
     // 회원가입
-    public String register(Context context, String uname, String userId, String userPw, String usex, String userEmail, String unumber){
+    public String register(Context context, String uname, String userId, String userPw, String uAge, String usex, String userEmail, String unumber){
         try {
-            url += "8080/register?uname="+uname+"&userId="+userId+"&userPw="+userPw+"&usex="+usex+"&userEmail="+userEmail+"&unumber="+unumber;
+            url += "8080/register?uname="+uname+"&userId="+userId+"&userPw="+userPw+"&uAge="+uAge+"&usex="+usex+"&userEmail="+userEmail+"&unumber="+unumber;
             return new GetTask().execute(url).get();
         } catch (ExecutionException e) {
             e.printStackTrace();

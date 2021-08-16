@@ -45,9 +45,9 @@ public class MovieInformationServer {
     }
 
     // 협업필터링 영화 목록
-    public String userMovieRank(Context context){
+    public String userMovieRank(Context context, String userId){
         try {
-            url += "8081/usermovierank";
+            url += "8081/usermovierank?userId="+userId;
             return new GetTask().execute(url).get();
         } catch (ExecutionException e) {
             e.printStackTrace();

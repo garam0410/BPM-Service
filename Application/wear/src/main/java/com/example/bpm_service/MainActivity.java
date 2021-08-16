@@ -127,7 +127,6 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     private void stopOnClick() {
         mSensorManager.unregisterListener(this);
         bpmData = bpmData.substring(0, bpmData.length()-1);
-        mTextView.setText(bpmData);
     }
 
     // 센서값 저장

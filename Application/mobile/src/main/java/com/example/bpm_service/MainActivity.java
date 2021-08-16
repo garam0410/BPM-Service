@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity{
         qrButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent qr = new Intent(getApplicationContext(), ChooseScanActivity.class);
+                Intent qr = new Intent(getApplicationContext(), QrActivity.class);
                 qr.putExtra("userId", userId);
                 startActivity(qr);
             }

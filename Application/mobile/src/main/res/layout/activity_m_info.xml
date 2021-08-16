@@ -277,13 +277,6 @@
 
             </LinearLayout>
 
-            <!--  영화 심박수 그래프      -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-            </LinearLayout>
-
             <!--  영화 정보 하단      -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -292,21 +285,21 @@
                 android:orientation="vertical">
 
                 <com.google.android.material.tabs.TabLayout
-                    android:layout_height="wrap_content"
+                    android:id="@+id/tab_layout"
                     android:layout_width="match_parent"
-                    android:id="@+id/tab_layout">
+                    android:layout_height="30dp">
 
                     <com.google.android.material.tabs.TabItem
                         android:id="@+id/tabItem1"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="상세정보"/>
+                        android:text="상세정보" />
 
                     <com.google.android.material.tabs.TabItem
                         android:id="@+id/tabItem2"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="리뷰"/>
+                        android:text="리뷰" />
 
                 </com.google.android.material.tabs.TabLayout>
 
@@ -378,7 +371,7 @@
                             <ListView
                                 android:id="@+id/commentList"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
+                                android:layout_height="match_parent">
 
                             </ListView>
 

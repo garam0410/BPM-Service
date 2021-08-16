@@ -55,7 +55,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 
         holder.textview.setText(item);
         holder.item.setTag(title);
-        Glide.with(holder.itemView.getContext()).load(image).override(100,200).into(holder.imageView);
+        Glide.with(holder.itemView.getContext()).load(image).override(120,200).into(holder.imageView);
         holder.item.setOnClickListener(onClickItem);
     }
 

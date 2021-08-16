@@ -22,7 +22,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:textSize="30dp"
-                android:text="지금 핫한 TOP 5"
+                android:text="지금 핫한 TOP 3"
                 android:padding="10dp"></TextView>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:textSize="30dp"
-                android:text="나를 위한 영화 TOP 5"
+                android:text="나를 위한 영화 TOP 3"
                 android:padding="10dp"></TextView>
 
             <androidx.recyclerview.widget.RecyclerView

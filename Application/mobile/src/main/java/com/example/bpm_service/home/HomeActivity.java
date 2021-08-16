@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Movie;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,10 +60,10 @@ public class HomeActivity extends Fragment {
         MovieInformationServer userRanking = new MovieInformationServer(IP);
 
         hotData = bpmRanking.hotMovieRank(context);
-        userData = userRanking.userMovieRank(context);
+        userData = userRanking.userMovieRank(context, userId);
 
         init(movieRankList,movieListAdapter_rank, hotData);
-        init(userRankList,movieListAdapter_user, hotData);
+        init(userRankList,movieListAdapter_user, userData);
 
         return view;
     }
@@ -78,11 +79,13 @@ public class HomeActivity extends Fragment {
             JSONArray json = new JSONArray(data);
 
             // Json 파싱
-            for(int i = 0; i<json.length(); i++){
+            for(int i = 0; i<3; i++){
                 JSONObject obj = (JSONObject)json.get(i);
 
                 String title = obj.getString("title");
                 String image = obj.getString("image");
+
+                System.out.println(image);
 
                 titleList.add(title);
                 imageList.add(image);
@@ -99,8 +102,8 @@ public class HomeActivity extends Fragment {
         itemList.add("1");
         itemList.add("2");
         itemList.add("3");
-        itemList.add("4");
-        itemList.add("5");
+//        itemList.add("4");
+//        itemList.add("5");
 
         // Adapter에 연결
         movieListAdapter = new MovieListAdapter(getActivity(), itemList, titleList,imageList, onClickItem);

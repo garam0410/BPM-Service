@@ -74,18 +74,18 @@ public class BpmTransactionService extends Service implements
     }
 
     @Override
-    public void onCapabilityChanged(@NonNull @NotNull CapabilityInfo capabilityInfo) {
+    public void onCapabilityChanged(@NonNull CapabilityInfo capabilityInfo) {
 
     }
 
     @Override
-    public void onDataChanged(@NonNull @NotNull DataEventBuffer dataEventBuffer) {
+    public void onDataChanged(@NonNull DataEventBuffer dataEventBuffer) {
 
     }
 
     // 스마트워치로부터 심박수 데이터를 받았을 때
     @Override
-    public void onMessageReceived(@NonNull @NotNull MessageEvent messageEvent) {
+    public void onMessageReceived(@NonNull MessageEvent messageEvent) {
 
         // 심박수 데이터 전속을 위한 Server 객체 생성
         SocialServer socialServer = new SocialServer(IP);

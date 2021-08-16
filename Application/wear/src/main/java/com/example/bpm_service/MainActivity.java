@@ -42,17 +42,12 @@ import java.util.concurrent.ExecutionException;
 public class MainActivity extends WearableActivity implements SensorEventListener{
 
     private static final String START_ACTIVITY_PATH = "/start-activity";
-//    public static final String WEARABLE_DATA_PATH = "/mypath";
-//    public static final String WEARABLE_DATA_PATH_Result = "/mypath/result";
 
     private TextView mTextView, movieTitle, movieTime;
-    private ArrayList<Integer> list;
     private SensorManager mSensorManager;
 
     private String bpmData = "";
     private String hour, minute;
-
-    private Button mBut;
 
     private Calendar calendar;
     private long triggerTime;
@@ -65,7 +60,6 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         mTextView = (TextView) findViewById(R.id.textView4);
         movieTitle = findViewById(R.id.movieTitle);
         movieTime = findViewById(R.id.movieTime);
-        mBut = (Button) findViewById(R.id.button);
 
         try {
             String message = getIntent().getStringExtra("message");
@@ -90,7 +84,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
             //message = "startMonitoring";
             if (message == null) {
-                mTextView.setText("The app must be launched from the mobile.");
+                mTextView.setText("휴대폰에서 실행해야합니다.");
                 try {
                     Thread.sleep(3000);  //스레드는 1초동안 일시 정지 상태가 된다.
                 } catch (InterruptedException e) {
@@ -105,7 +99,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             if (message.equals("startMonitoring")) {
                 movieTitle.setText(title);
                 movieTime.setText(time);
-                mTextView.setText("심박수를 측정하는 중입니다.");
+                mTextView.setText("측정중");
 
                 calendar.setTimeInMillis(System.currentTimeMillis());
                 calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
@@ -123,11 +117,9 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     // 측정 시작
     private void startSensor() {
-        list = new ArrayList<>();
         mSensorManager = ((SensorManager) getSystemService(SENSOR_SERVICE));
 
         Sensor mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
-//        mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mHeartRateSensor,SensorManager.SENSOR_DELAY_FASTEST);
     }
 
@@ -143,7 +135,6 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_HEART_RATE){
             String msg = (int) event.values[0] + " Bpm";
-            mTextView.setText(msg);
             bpmData += (int)event.values[0] + ",";
             System.out.println(event.values[0]);  //이거 값을 전달해야
 

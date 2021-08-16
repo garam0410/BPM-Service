@@ -59,7 +59,7 @@ public class HomeActivity extends Fragment {
         MovieInformationServer userRanking = new MovieInformationServer(IP);
 
         hotData = bpmRanking.hotMovieRank(context);
-        //userData = userRanking.userMovieRank(context);
+        userData = userRanking.userMovieRank(context);
 
         init(movieRankList,movieListAdapter_rank, hotData);
         init(userRankList,movieListAdapter_user, hotData);

@@ -19,18 +19,21 @@
 
         <TextView
             android:id="@+id/movieTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_margin="10dp"
             android:text="movie name"
+            android:gravity="center"
             android:textColor="#ffffff" />
 
         <TextClock
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:format12Hour="hh:mm:ss"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:textAlignment="center"/>
 
         <TextView
             android:id="@+id/movieTime"
@@ -46,19 +49,6 @@
             android:layout_gravity="center_horizontal"
             android:layout_margin="10dp"
             android:text="measure BPM" />
-
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="나가기"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.501"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.612" />
 
     </LinearLayout>
 </androidx.wear.widget.BoxInsetLayout>

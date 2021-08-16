@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Movie;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -119,25 +120,6 @@ public class MInfoActivity extends AppCompatActivity{
 
             }
         });
-
-//        poster.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                SocialServer socialServer = new SocialServer(IP);
-//                //System.out.println(socialServer.selectCommentList("1"));
-
-//
-//                try {
-//                    JSONObject json = new JSONObject();
-//                    json.put("mid", "1");
-//                    json.put("userId", "garam040");
-//                    json.put("comment", "test 변경");
-//                    socialServer.insertComment("25",json.toString());
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
 
         // 댓글 리스트 어댑터 설정
         commentListAdapter = new CommentListAdapter();

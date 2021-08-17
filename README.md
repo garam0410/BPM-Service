@@ -16,15 +16,49 @@
 </br>
 
 ## **2. 서비스 이용 방법**
+<br>
 
-레포지토리에 있는 **Movie by Heart.apk** 파일을 Android OS를 사용하는 스마트폰에 설치 후, 사용 가능
+ **스마트폰 어플리케이션만 실행**
 
-    어플리케이션의 회원가입을 수행 또는 아래에 데이터가 쌓인 계정을 사용하시면 됩니다!
+    Movie by Heart_mobile.apk 파일을 설치해서 실행
+
+**WearOS 기기도 실행**
+
+1. Android Studio 설치
+2. Android Studio 에서 레포지토리를 clone 하여, Application 디렉토리를 프로젝트 폴더로 Import
+3. 스마트폰 Application은 에뮬레이터(Oreo 이상) 설치 후, Run
+4. WearOS Application은 WatchOS 기기의 블루투스 디버깅 모드 활성화
+5. adb.exe 디렉토리에서 CLI 명령어 실행
+
+    adb forward tcp:4444 localabstract:/adb-hub
+
+    adb connect 127.0.0.1:4444
+
+6. WearOS Run
+
+<br>
+
+
+서비스 이용시에는 어플리케이션의 회원가입을 수행 또는 아래에 데이터가 쌓인 계정을 사용하시면 됩니다!
 
     ID : garam0410
     PW : rlarkfka
 
 </br>
+
+**QR 인식**
+
+1. QR 코드 생성 사이트 접속
+
+2. JSON 형식으로 Text 작성
+
+    {"title":"컨저링 3: 악마가 시켰다","date":"2021-08-05","time":"18:11:00~14:59:00"}
+
+3. QR 생성 후, 어플리케이션 우측 상단의 QR 버튼으로 인식 수행
+
+4. 측정 예약을 누르면, 해당시간에 자동으로 WearOS 기기로 신호를 보내서 측정 시작
+
+<br>
 
 ## **3. 개발환경**
 <br>
@@ -85,7 +119,7 @@
 
 <br>
 
-- **사용자 관리 서비스**
+- ### **[사용자 관리 서비스](https://github.com/garam0410/OIDC_User_Management_Service)**
     - 로그인
 
     - 회원가입
@@ -93,27 +127,33 @@
     
 <br>
 
-- **영화 정보 서비스**
+- ### **[영화 정보 서비스](https://github.com/garam0410/OIDC_Movie_Information_Service)**
     - 영화 데이터 파싱
 
     - 영화 상세정보 제공
+
     - 영화 랭킹 데이터 제공
+
     - 영화 좋아요
+    
     - 관람한 영화 및 좋아요 한 영화 정보 제공
 
 <br>
 
-- **소셜 서비스**
+- ### **[소셜 서비스](https://github.com/garam0410/OIDC_Social_Service)**
     - 댓글 추가
 
     - 댓글 수정
+
     - 댓글 삭제
+
     - 영화 별 댓글 리스트 제공
+
     - 심박수 처리
 
 <br>
 
-- **분석 서비스**
+- ### **[분석 서비스](https://github.com/garam0410/OIDC_Analysis_Service)**
     - 아웃라이어 알고리즘을 이용한 심박수 데이터 분석
 
     - 클러스터링 및 협업필터링 알고리즘을 이용한 사용자 추천
@@ -180,12 +220,12 @@
     - WearOS에서 Android 휴대폰으로 sendMessage - **MainActivity.java**
     <br>
 
-        ![image](https://user-images.githubusercontent.com/28921379/129572623-07f12e24-84f5-46e6-8c68-3efd050a1eaa.png)
+    ![image](https://user-images.githubusercontent.com/28921379/129572623-07f12e24-84f5-46e6-8c68-3efd050a1eaa.png)
 
     - Android 휴대폰에서 MessageReceived - **BpmTransactionService.java**
     <br>
 
-        ![image](https://user-images.githubusercontent.com/28921379/129572773-b65d3140-d717-4321-9249-045b5c44c489.png)
+    ![image](https://user-images.githubusercontent.com/28921379/129572773-b65d3140-d717-4321-9249-045b5c44c489.png)
 
 </br>
 
